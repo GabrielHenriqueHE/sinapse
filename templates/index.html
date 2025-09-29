@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+{% include 'partials/_head.html' %}
+
+<body class="h-screen w-screen bg-white">
+    <div class="app">
+        <div class="w-screen h-screen bg-[url(/static/img/hero-bg.jpg)] bg-cover bg-center bg-no-repeat">
+            <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]">
+            </div>
+            <div class="relative z-10 flex flex-col h-full">
+
+                <header class="w-full flex items-center justify-between bg-transparent px-4 md:px-16 py-4 md:py-8">
+                    <h1 class="font-mono font-[100] text-2xl sm:text-3xl md:text-5xl text-white drop-shadow-lg">SINAPSE
+                    </h1>
+
+                    <div class="flex space-x-2 md:space-x-3">
+                        <button
+                            class="font-mono text-white border border-white/50 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-white/10 transition duration-300 text-sm md:text-base">
+                            Entrar
+                        </button>
+                        <button
+                            class="font-mono bg-white text-gray-900 px-3 py-1 md:px-4 md:py-2 rounded-lg hover:bg-gray-100 transition duration-300 text-sm md:text-base">
+                            Cadastrar
+                        </button>
+                    </div>
+                </header>
+
+                <section class="flex-grow flex items-center justify-center px-4">
+                    <div class="text-center space-y-6 md:space-y-8 max-w-4xl mx-auto">
+                        <h2
+                            class="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center drop-shadow-lg leading-tight">
+                            Conectando você a eventos incríveis!
+                        </h2>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button
+                                class="font-mono bg-white text-gray-900 px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg hover:cursor-pointer text-sm md:text-base">
+                                Explorar Eventos
+                            </button>
+                            <button
+                                class="font-mono border border-white text-white px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 hover:cursor-pointer text-sm md:text-base">
+                                Saiba Mais
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
