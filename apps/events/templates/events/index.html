@@ -1,0 +1,614 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eventos - Sinapse</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ["Roboto Mono", "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+
+      .carousel-container {
+        scroll-behavior: smooth;
+      }
+
+      .event-card {
+        flex: 0 0 auto;
+        transition: transform 0.3s ease;
+      }
+
+      .event-card:hover {
+        transform: translateY(-8px);
+      }
+    </style>
+  </head>
+
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <div class="flex items-center">
+            <h1 class="font-mono text-2xl font-bold text-gray-900">SINAPSE</h1>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="hidden md:flex space-x-8">
+            <a
+              href="#"
+              class="font-mono text-gray-900 hover:text-gray-600 transition duration-300"
+              >Eventos</a
+            >
+            <a
+              href="#"
+              class="font-mono text-gray-500 hover:text-gray-600 transition duration-300"
+              >Categorias</a
+            >
+            <a
+              href="#"
+              class="font-mono text-gray-500 hover:text-gray-600 transition duration-300"
+              >Criar Evento</a
+            >
+          </nav>
+
+          <!-- User Actions -->
+          <div class="flex items-center space-x-4">
+            <button
+              class="font-mono text-gray-700 hover:text-gray-900 transition duration-300"
+            >
+              Pesquisar
+            </button>
+            <button
+              class="font-mono border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-300"
+            >
+              Entrar
+            </button>
+            <button
+              class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+            >
+              Cadastrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Seção: Eventos Mais Populares -->
+      <section class="mb-16">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-mono text-3xl font-bold text-gray-900">
+            Os mais populares
+          </h2>
+          <div class="flex space-x-2">
+            <button
+              onclick="scrollCarousel('popular', -300)"
+              class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+            >
+              ←
+            </button>
+            <button
+              onclick="scrollCarousel('popular', 300)"
+              class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div
+            id="popularCarousel"
+            class="carousel-container flex space-x-6 overflow-x-auto scrollbar-hide pb-4"
+          >
+            <!-- Card 1 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-purple-500 to-pink-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Tecnologia
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Tech Conference 2024
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  A maior conferência de tecnologia do ano com os melhores
+                  especialistas da indústria.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 25 Out</span>
+                  <span class="font-mono">📍 São Paulo</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-blue-500 to-cyan-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Música
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Festival de Verão
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Três dias de música com artistas nacionais e internacionais no
+                  coração da cidade.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 15 Dez</span>
+                  <span class="font-mono">📍 Rio de Janeiro</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-green-500 to-emerald-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Negócios
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Startup Summit
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Conecte-se com investidores e empreendedores no maior evento
+                  de startups do Brasil.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 08 Nov</span>
+                  <span class="font-mono">📍 Florianópolis</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-orange-500 to-red-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Arte
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Exposição Moderna
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Arte contemporânea de artistas emergentes em uma galeria
+                  exclusiva.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 30 Out</span>
+                  <span class="font-mono">📍 Belo Horizonte</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-purple-600 to-blue-600 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Esportes
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Maratona da Cidade
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Participe da corrida mais esperada do ano com percursos de 5k,
+                  10k e 21k.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 12 Nov</span>
+                  <span class="font-mono">📍 Curitiba</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção: Eventos Mais Novos -->
+      <section class="mb-16">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="font-mono text-3xl font-bold text-gray-900">
+            Novos eventos
+          </h2>
+          <div class="flex space-x-2">
+            <button
+              onclick="scrollCarousel('new', -300)"
+              class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+            >
+              ←
+            </button>
+            <button
+              onclick="scrollCarousel('new', 300)"
+              class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+            >
+              →
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div
+            id="newCarousel"
+            class="carousel-container flex space-x-6 overflow-x-auto scrollbar-hide pb-4"
+          >
+            <!-- Card 1 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-yellow-500 to-orange-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Workshop
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                >
+                  NOVO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  UX Design Workshop
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Aprenda as melhores práticas de design de experiência do
+                  usuário com experts.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 05 Nov</span>
+                  <span class="font-mono">📍 Online</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-pink-500 to-rose-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Gastronomia
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                >
+                  NOVO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Festival de Comida
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Descubra sabores únicos com chefs renomados e food trucks
+                  especiais.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 18 Nov</span>
+                  <span class="font-mono">📍 Porto Alegre</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-indigo-500 to-purple-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Cinema
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                >
+                  NOVO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Mostra Independente
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Filmes independentes nacionais e internacionais em sessões
+                  exclusivas.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 22 Nov</span>
+                  <span class="font-mono">📍 Salvador</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-teal-500 to-cyan-500 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Sustentabilidade
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                >
+                  NOVO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Eco Conference
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Discutindo soluções sustentáveis para um futuro melhor no
+                  planeta.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 28 Nov</span>
+                  <span class="font-mono">📍 Brasília</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-emerald-500"
+                    >🔓 Aberto</span
+                  >
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+            >
+              <div
+                class="h-48 bg-gradient-to-br from-gray-700 to-gray-900 relative"
+              >
+                <span
+                  class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
+                >
+                  Networking
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                >
+                  NOVO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Meetup Tech
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Encontro mensal da comunidade tech para networking e troca de
+                  ideias.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 14 Dez</span>
+                  <span class="font-mono">📍 Campinas</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-red-500">
+                    🔒 Fechado
+                  </span>
+                  <button
+                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function scrollCarousel(type, scrollAmount) {
+        const carousel = document.getElementById(`${type}Carousel`);
+        carousel.scrollBy({
+          left: scrollAmount,
+          behavior: "smooth",
+        });
+      }
+
+      // Scroll com mouse wheel nos carrosseis
+      document.querySelectorAll(".carousel-container").forEach((carousel) => {
+        carousel.addEventListener("wheel", (event) => {
+          event.preventDefault();
+          carousel.scrollBy({
+            left: event.deltaY < 0 ? -300 : 300,
+            behavior: "smooth",
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

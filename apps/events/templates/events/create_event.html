@@ -1,0 +1,271 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Evento - Sinapse</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['Roboto Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="font-mono text-2xl font-bold text-gray-900">SINAPSE</h1>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="font-mono text-gray-500 hover:text-gray-600 transition duration-300">Eventos</a>
+                    <a href="#" class="font-mono text-gray-500 hover:text-gray-600 transition duration-300">Categorias</a>
+                    <a href="#" class="font-mono text-gray-900 hover:text-gray-600 transition duration-300">Criar Evento</a>
+                </nav>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="font-mono text-gray-700 hover:text-gray-900 transition duration-300">
+                        Pesquisar
+                    </button>
+                    <div class="flex items-center space-x-3">
+                        <span class="font-mono text-gray-700">Olá, Organizador!</span>
+                        <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho da Página -->
+        <div class="text-center mb-12">
+            <h1 class="font-mono text-4xl font-bold text-gray-900 mb-4">Criar Novo Evento</h1>
+            <p class="font-mono text-lg text-gray-600 max-w-2xl mx-auto">
+                Preencha os dados do seu evento e compartilhe experiências incríveis com a comunidade
+            </p>
+        </div>
+
+        <!-- Formulário -->
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+            <form class="space-y-8">
+                <!-- Seção: Informações Básicas -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Informações Básicas</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Nome do Evento -->
+                        <div class="md:col-span-2">
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Nome do Evento *
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: Tech Conference 2024"
+                                   required>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="md:col-span-2">
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Descrição do Evento *
+                            </label>
+                            <textarea 
+                                class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300 resize-none"
+                                rows="4"
+                                placeholder="Descreva seu evento de forma atraente... (máximo 500 caracteres)"
+                                maxlength="500"
+                                required></textarea>
+                            <div class="font-mono text-xs text-gray-500 mt-2 text-right">
+                                <span id="charCount">0</span>/500 caracteres
+                            </div>
+                        </div>
+
+                        <!-- Local -->
+                        <div class="md:col-span-2">
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Local do Evento *
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: Centro de Convenções, São Paulo - SP"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção: Data e Horário -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Data e Horário</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Data do Evento -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Data do Evento *
+                            </label>
+                            <input type="date" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   required>
+                        </div>
+
+                        <!-- Carga Horária -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Carga Horária (horas) *
+                            </label>
+                            <input type="number" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: 8"
+                                   min="1"
+                                   max="100"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção: Configurações -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Configurações</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Limite de Participantes -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Limite de Participantes *
+                            </label>
+                            <input type="number" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: 100"
+                                   min="1"
+                                   required>
+                            <p class="font-mono text-xs text-gray-500 mt-2">
+                                Digite 0 para evento sem limite
+                            </p>
+                        </div>
+
+                        <!-- Categoria -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Categoria *
+                            </label>
+                            <select class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                    required>
+                                <option value="">Selecione uma categoria</option>
+                                <option value="tecnologia">Tecnologia</option>
+                                <option value="musica">Música</option>
+                                <option value="negocios">Negócios</option>
+                                <option value="arte">Arte</option>
+                                <option value="esportes">Esportes</option>
+                                <option value="workshop">Workshop</option>
+                                <option value="gastronomia">Gastronomia</option>
+                                <option value="cinema">Cinema</option>
+                                <option value="sustentabilidade">Sustentabilidade</option>
+                                <option value="networking">Networking</option>
+                                <option value="educacao">Educação</option>
+                                <option value="saude">Saúde & Bem-estar</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção: Imagem do Evento (Opcional) -->
+                <div class="pb-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Imagem do Evento</h2>
+                    
+                    <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-gray-400 transition duration-300">
+                        <div class="max-w-md mx-auto">
+                            <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="mb-4">
+                                <button type="button" class="font-mono bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition duration-300">
+                                    Escolher Imagem
+                                </button>
+                                <input type="file" class="hidden" accept="image/*">
+                            </div>
+                            <p class="font-mono text-sm text-gray-500">
+                                PNG, JPG, GIF até 10MB. Recomendado: 1200x600px
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-end pt-6">
+                    <button type="button" 
+                            class="font-mono border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition duration-300 order-2 sm:order-1">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                            class="font-mono bg-black text-white px-8 py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg order-1 sm:order-2">
+                        Criar Evento
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="mt-8 text-center">
+            <p class="font-mono text-sm text-gray-500">
+                Ao criar um evento, você concorda com nossos 
+                <a href="#" class="text-black hover:underline">Termos de Serviço</a> 
+                e 
+                <a href="#" class="text-black hover:underline">Política de Eventos</a>
+            </p>
+        </div>
+    </main>
+
+    <script>
+        // Contador de caracteres para descrição
+        const textarea = document.querySelector('textarea');
+        const charCount = document.getElementById('charCount');
+        
+        textarea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Upload de imagem
+        const fileInput = document.querySelector('input[type="file"]');
+        const uploadButton = document.querySelector('button[type="button"]');
+        
+        uploadButton.addEventListener('click', function() {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                // Aqui você pode adicionar preview da imagem
+                console.log('Imagem selecionada:', this.files[0].name);
+            }
+        });
+
+        // Validação de data mínima (hoje)
+        const dateInput = document.querySelector('input[type="date"]');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.min = today;
+    </script>
+</body>
+</html>
