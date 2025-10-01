@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.events",
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "development",
+        "NAME": "sinapse",
         "USER": "postgres",
         "PASSWORD": "postgres",
         "HOST": "localhost",
