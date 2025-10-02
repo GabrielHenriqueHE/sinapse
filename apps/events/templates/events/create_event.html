@@ -60,7 +60,7 @@
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Cabeçalho da Página -->
         <div class="text-center mb-12">
-            <h1 class="font-mono text-4xl font-bold text-gray-900 mb-4">Criar Novo Evento</h1>
+            <h1 class="font-mono text-4xl font-bold text-gray-900 mb-4">Criar novo evento</h1>
             <p class="font-mono text-lg text-gray-600 max-w-2xl mx-auto">
                 Preencha os dados do seu evento e compartilhe experiências incríveis com a comunidade
             </p>
@@ -100,16 +100,78 @@
                                 <span id="charCount">0</span>/500 caracteres
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Local -->
+                <!-- Seção: Localização -->
+                <div class="border-b border-gray-200 pb-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Localização</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Rua -->
                         <div class="md:col-span-2">
                             <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
-                                Local do Evento *
+                                Rua/Avenida *
                             </label>
                             <input type="text" 
                                    class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                                   placeholder="Ex: Centro de Convenções, São Paulo - SP"
+                                   placeholder="Ex: Avenida Paulista, 1234"
                                    required>
+                        </div>
+
+                        <!-- Complemento -->
+                        <div class="md:col-span-2">
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Complemento
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: Sala 501, Bloco B, Andar 5">
+                        </div>
+
+                        <!-- Cidade -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Cidade *
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: São Paulo"
+                                   required>
+                        </div>
+
+                        <!-- Estado -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                Estado *
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: São Paulo"
+                                   required>
+                        </div>
+
+                        <!-- País -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                País *
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: Brasil"
+                                   value="Brasil"
+                                   required>
+                        </div>
+
+                        <!-- CEP -->
+                        <div>
+                            <label class="font-mono text-sm font-medium text-gray-700 block mb-3">
+                                CEP
+                            </label>
+                            <input type="text" 
+                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
+                                   placeholder="Ex: 01310-100"
+                                   maxlength="9">
                         </div>
                     </div>
                 </div>
@@ -266,6 +328,16 @@
         const dateInput = document.querySelector('input[type="date"]');
         const today = new Date().toISOString().split('T')[0];
         dateInput.min = today;
+
+        // Formatação de CEP
+        const cepInput = document.querySelector('input[placeholder="Ex: 01310-100"]');
+        cepInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 5) {
+                value = value.substring(0, 5) + '-' + value.substring(5, 8);
+            }
+            this.value = value;
+        });
     </script>
 </body>
 </html>

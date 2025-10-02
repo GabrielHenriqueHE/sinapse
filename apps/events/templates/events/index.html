@@ -49,6 +49,17 @@
       .event-card:hover {
         transform: translateY(-8px);
       }
+
+      /* Efeito de desbotamento para eventos fechados */
+      .event-closed {
+        opacity: 0.7;
+        filter: grayscale(0.3);
+      }
+
+      .event-closed:hover {
+        opacity: 0.9;
+        filter: grayscale(0.1);
+      }
     </style>
   </head>
 
@@ -75,7 +86,7 @@
               >Categorias</a
             >
             <a
-              href="#"
+              href="{% url 'create_event' %}"
               class="font-mono text-gray-500 hover:text-gray-600 transition duration-300"
               >Criar Evento</a
             >
@@ -88,27 +99,248 @@
             >
               Pesquisar
             </button>
-            <button
-              class="font-mono border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-300"
-            >
-              Entrar
-            </button>
-            <button
-              class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
-            >
-              Cadastrar
-            </button>
+            <div class="flex items-center space-x-3">
+              <span class="font-mono text-gray-700">Olá, Organizador!</span>
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"
+              ></div>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <!-- Seção: Meus Eventos -->
+      <section class="mb-16">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="font-mono text-3xl font-bold text-gray-900">
+              Meus Eventos
+            </h2>
+            <p class="font-mono text-gray-600 mt-2">
+              Eventos que você está organizando
+            </p>
+          </div>
+          <div class="flex space-x-4">
+            <a
+              href="{% url 'create_event' %}"
+              class="font-mono bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg flex items-center space-x-2"
+            >
+              <span>+</span>
+              <span>Criar Evento</span>
+            </a>
+            <div class="flex space-x-2">
+              <button
+                onclick="scrollCarousel('myEvents', -300)"
+                class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+              >
+                ←
+              </button>
+              <button
+                onclick="scrollCarousel('myEvents', 300)"
+                class="font-mono bg-gray-200 hover:bg-gray-300 p-3 rounded-lg transition duration-300"
+              >
+                →
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div
+            id="myEventsCarousel"
+            class="carousel-container flex space-x-6 overflow-x-auto scrollbar-hide pb-4"
+          >
+            <!-- Card 1 - Meu Evento ABERTO -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 relative"
+            >
+              <div class="absolute top-4 left-4 z-10">
+                <span
+                  class="font-mono bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  MEU EVENTO
+                </span>
+              </div>
+              <div
+                class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 relative"
+              >
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  🔓 ABERTO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Workshop de Inovação
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Workshop prático sobre metodologias ágeis e inovação
+                  corporativa para startups.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 20 Nov</span>
+                  <span class="font-mono">📍 São Paulo</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >45 inscritos</span
+                  >
+                  <button
+                    class="font-mono bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                  >
+                    Gerenciar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 - Meu Evento FECHADO -->
+            <div
+              class="event-card event-closed w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 relative"
+            >
+              <div class="absolute top-4 left-4 z-10">
+                <span
+                  class="font-mono bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  MEU EVENTO
+                </span>
+              </div>
+              <div
+                class="h-48 bg-gradient-to-br from-gray-600 to-gray-800 relative"
+              >
+                <span
+                  class="absolute top-4 right-4 font-mono bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold"
+                >
+                  🔒 FECHADO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Meetup Developers
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  Encontro da comunidade de desenvolvedores para networking e
+                  talks técnicas.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 05 Out</span>
+                  <span class="font-mono">📍 Online</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-red-600"
+                    >Encerrado</span
+                  >
+                  <button
+                    class="font-mono bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    disabled
+                  >
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 - Meu Evento ABERTO -->
+            <div
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-blue-200 relative"
+            >
+              <div class="absolute top-4 left-4 z-10">
+                <span
+                  class="font-mono bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  MEU EVENTO
+                </span>
+              </div>
+              <div
+                class="h-48 bg-gradient-to-br from-green-500 to-emerald-600 relative"
+              >
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  🔓 ABERTO
+                </span>
+              </div>
+              <div class="p-6">
+                <h3 class="font-mono text-xl font-bold text-gray-900 mb-2">
+                  Hackathon Sustentável
+                </h3>
+                <p class="text-gray-600 mb-4 line-clamp-2">
+                  48 horas de desenvolvimento de soluções para problemas
+                  ambientais urbanos.
+                </p>
+                <div
+                  class="flex items-center justify-between text-sm text-gray-500 mb-4"
+                >
+                  <span class="font-mono">📅 15 Dez</span>
+                  <span class="font-mono">📍 Curitiba</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >28 inscritos</span
+                  >
+                  <button
+                    class="font-mono bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+                  >
+                    Gerenciar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Vazio - Criar Novo Evento -->
+            <div
+              class="event-card w-80 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-lg overflow-hidden border-2 border-dashed border-gray-300 hover:border-gray-400 transition duration-300"
+            >
+              <div
+                class="h-full flex flex-col items-center justify-center p-8 text-center"
+              >
+                <div
+                  class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mb-4"
+                >
+                  <svg
+                    class="w-8 h-8 text-gray-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                    ></path>
+                  </svg>
+                </div>
+                <h3 class="font-mono text-lg font-bold text-gray-700 mb-2">
+                  Criar Novo Evento
+                </h3>
+                <p class="font-mono text-sm text-gray-600 mb-4">
+                  Compartilhe sua experiência com a comunidade
+                </p>
+                <a
+                  href="{% url 'create_event' %}"
+                  class="font-mono bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                >
+                  Começar Agora
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- Seção: Eventos Mais Populares -->
       <section class="mb-16">
         <div class="flex justify-between items-center mb-6">
           <h2 class="font-mono text-3xl font-bold text-gray-900">
-            Os mais populares
+            Eventos Mais Populares
           </h2>
           <div class="flex space-x-2">
             <button
@@ -131,9 +363,9 @@
             id="popularCarousel"
             class="carousel-container flex space-x-6 overflow-x-auto scrollbar-hide pb-4"
           >
-            <!-- Card 1 -->
+            <!-- Card 1 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-purple-500 to-pink-500 relative"
@@ -142,6 +374,11 @@
                   class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
                 >
                   Tecnologia
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -159,21 +396,21 @@
                   <span class="font-mono">📍 São Paulo</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Inscrições Abertas</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
                   >
-                    Ver Detalhes
+                    Participar
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 2 -->
+            <!-- Card 2 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-blue-500 to-cyan-500 relative"
@@ -182,6 +419,11 @@
                   class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
                 >
                   Música
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -199,21 +441,21 @@
                   <span class="font-mono">📍 Rio de Janeiro</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Vagas Disponíveis</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
                   >
-                    Ver Detalhes
+                    Participar
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 3 -->
+            <!-- Card 3 - FECHADO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card event-closed w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-green-500 to-emerald-500 relative"
@@ -222,6 +464,11 @@
                   class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
                 >
                   Negócios
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold"
+                >
+                  🔒 FECHADO
                 </span>
               </div>
               <div class="p-6">
@@ -239,21 +486,22 @@
                   <span class="font-mono">📍 Florianópolis</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-red-600"
+                    >Inscrições Encerradas</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    disabled
                   >
-                    Ver Detalhes
+                    Esgotado
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 4 -->
+            <!-- Card 4 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-orange-500 to-red-500 relative"
@@ -262,6 +510,11 @@
                   class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
                 >
                   Arte
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                >
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -279,21 +532,21 @@
                   <span class="font-mono">📍 Belo Horizonte</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Entrada Livre</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
                   >
-                    Ver Detalhes
+                    Confirmar
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 5 -->
+            <!-- Card 5 - FECHADO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card event-closed w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-purple-600 to-blue-600 relative"
@@ -302,6 +555,11 @@
                   class="absolute top-4 left-4 font-mono bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm"
                 >
                   Esportes
+                </span>
+                <span
+                  class="absolute top-4 right-4 font-mono bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold"
+                >
+                  🔒 FECHADO
                 </span>
               </div>
               <div class="p-6">
@@ -319,13 +577,14 @@
                   <span class="font-mono">📍 Curitiba</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-red-600"
+                    >Lotado</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    disabled
                   >
-                    Ver Detalhes
+                    Esgotado
                   </button>
                 </div>
               </div>
@@ -338,7 +597,7 @@
       <section class="mb-16">
         <div class="flex justify-between items-center mb-6">
           <h2 class="font-mono text-3xl font-bold text-gray-900">
-            Novos eventos
+            Eventos Recentes
           </h2>
           <div class="flex space-x-2">
             <button
@@ -361,9 +620,9 @@
             id="newCarousel"
             class="carousel-container flex space-x-6 overflow-x-auto scrollbar-hide pb-4"
           >
-            <!-- Card 1 -->
+            <!-- Card 1 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-yellow-500 to-orange-500 relative"
@@ -374,9 +633,9 @@
                   Workshop
                 </span>
                 <span
-                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
                 >
-                  NOVO
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -394,21 +653,21 @@
                   <span class="font-mono">📍 Online</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Últimas Vagas</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
                   >
-                    Ver Detalhes
+                    Inscrever
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 2 -->
+            <!-- Card 2 - FECHADO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card event-closed w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-pink-500 to-rose-500 relative"
@@ -419,9 +678,9 @@
                   Gastronomia
                 </span>
                 <span
-                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                  class="absolute top-4 right-4 font-mono bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold"
                 >
-                  NOVO
+                  🔒 FECHADO
                 </span>
               </div>
               <div class="p-6">
@@ -439,21 +698,22 @@
                   <span class="font-mono">📍 Porto Alegre</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-red-600"
+                    >Encerrado</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    disabled
                   >
-                    Ver Detalhes
+                    Esgotado
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 3 -->
+            <!-- Card 3 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-indigo-500 to-purple-500 relative"
@@ -464,9 +724,9 @@
                   Cinema
                 </span>
                 <span
-                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
                 >
-                  NOVO
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -484,21 +744,21 @@
                   <span class="font-mono">📍 Salvador</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Ingressos Disponíveis</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
                   >
-                    Ver Detalhes
+                    Reservar
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 4 -->
+            <!-- Card 4 - FECHADO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card event-closed w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-red-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-teal-500 to-cyan-500 relative"
@@ -509,9 +769,9 @@
                   Sustentabilidade
                 </span>
                 <span
-                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                  class="absolute top-4 right-4 font-mono bg-red-500 text-white px-2 py-1 rounded-full text-sm font-bold"
                 >
-                  NOVO
+                  🔒 FECHADO
                 </span>
               </div>
               <div class="p-6">
@@ -529,21 +789,22 @@
                   <span class="font-mono">📍 Brasília</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-emerald-500"
-                    >🔓 Aberto</span
+                  <span class="font-mono text-lg font-bold text-red-600"
+                    >Inscrições Fechadas</span
                   >
                   <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                    class="font-mono bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
+                    disabled
                   >
-                    Ver Detalhes
+                    Indisponível
                   </button>
                 </div>
               </div>
             </div>
 
-            <!-- Card 5 -->
+            <!-- Card 5 - ABERTO -->
             <div
-              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden"
+              class="event-card w-80 bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-green-200"
             >
               <div
                 class="h-48 bg-gradient-to-br from-gray-700 to-gray-900 relative"
@@ -554,9 +815,9 @@
                   Networking
                 </span>
                 <span
-                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-2 py-1 rounded-full text-xs"
+                  class="absolute top-4 right-4 font-mono bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold"
                 >
-                  NOVO
+                  🔓 ABERTO
                 </span>
               </div>
               <div class="p-6">
@@ -574,13 +835,13 @@
                   <span class="font-mono">📍 Campinas</span>
                 </div>
                 <div class="flex justify-between items-center">
-                  <span class="font-mono text-lg font-bold text-red-500">
-                    🔒 Fechado
-                  </span>
-                  <button
-                    class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300"
+                  <span class="font-mono text-lg font-bold text-green-600"
+                    >Participação Livre</span
                   >
-                    Ver Detalhes
+                  <button
+                    class="font-mono bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition duration-300"
+                  >
+                    Confirmar
                   </button>
                 </div>
               </div>

@@ -1,0 +1,299 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Conference 2024 - Sinapse</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['Roboto Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <h1 class="font-mono text-2xl font-bold text-gray-900">SINAPSE</h1>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#" class="font-mono text-gray-900 hover:text-gray-600 transition duration-300">Eventos</a>
+                    <a href="#" class="font-mono text-gray-500 hover:text-gray-600 transition duration-300">Categorias</a>
+                    <a href="#" class="font-mono text-gray-500 hover:text-gray-600 transition duration-300">Criar Evento</a>
+                </nav>
+
+                <!-- User Actions -->
+                <div class="flex items-center space-x-4">
+                    <button class="font-mono text-gray-700 hover:text-gray-900 transition duration-300">
+                        Pesquisar
+                    </button>
+                    <button class="font-mono border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition duration-300">
+                        Entrar
+                    </button>
+                    <button class="font-mono bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition duration-300">
+                        Cadastrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Cabeçalho do Evento -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+            <!-- Imagem do Evento -->
+            <div class="h-80 bg-gradient-to-br from-purple-500 to-pink-500 relative">
+                <div class="absolute inset-0 bg-black/20"></div>
+                <div class="absolute bottom-6 left-8 right-8">
+                    <div class="flex flex-col md:flex-row md:items-end md:justify-between">
+                        <div>
+                            <!-- Status Badge -->
+                            <span class="font-mono bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4 inline-block">
+                                🔓 EVENTO ABERTO
+                            </span>
+                            <h1 class="font-mono text-4xl md:text-5xl font-bold text-white mb-2">Tech Conference 2024</h1>
+                            <p class="font-mono text-white/90 text-lg">A maior conferência de tecnologia do ano</p>
+                        </div>
+                        <div class="mt-4 md:mt-0">
+                            <button class="font-mono bg-white text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg">
+                                Participar do Evento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Coluna Principal -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Sobre o Evento -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Sobre o Evento</h2>
+                    <div class="prose max-w-none">
+                        <p class="font-mono text-gray-700 leading-relaxed mb-4">
+                            A Tech Conference 2024 é o maior evento de tecnologia do ano, reunindo os melhores especialistas, 
+                            empreendedores e entusiastas da indústria. Durante três dias intensos, exploraremos as tendências 
+                            mais recentes em IA, blockchain, cloud computing e transformação digital.
+                        </p>
+                        <p class="font-mono text-gray-700 leading-relaxed mb-4">
+                            Com palestras inspiradoras, workshops práticos e oportunidades únicas de networking, este evento 
+                            é imperdível para profissionais que desejam se manter na vanguarda da inovação tecnológica.
+                        </p>
+                        <h3 class="font-mono text-xl font-bold text-gray-900 mt-6 mb-4">O que você vai aprender:</h3>
+                        <ul class="font-mono text-gray-700 space-y-2">
+                            <li>• Estratégias de implementação de IA generativa</li>
+                            <li>• Segurança cibernética em ambientes cloud</li>
+                            <li>• Metodologias ágeis para times de alta performance</li>
+                            <li>• Desenvolvimento sustentável de software</li>
+                            <li>• Tendências do mercado de tecnologia para 2025</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Informações do Organizador -->
+                <div class="bg-white rounded-2xl shadow-lg p-8">
+                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Organizador</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full"></div>
+                        <div>
+                            <h3 class="font-mono text-xl font-bold text-gray-900">Tech Community BR</h3>
+                            <p class="font-mono text-gray-600">Comunidade de tecnologia com mais de 50 eventos realizados</p>
+                            <div class="flex space-x-4 mt-2">
+                                <span class="font-mono text-sm text-gray-500">⭐ 4.8 (124 avaliações)</span>
+                                <span class="font-mono text-sm text-gray-500">📅 52 eventos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-8">
+                <!-- Informações Principais -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-6">Informações do Evento</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Data -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="font-mono text-gray-600">📅</span>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-gray-600">Data do Evento</p>
+                                <p class="font-mono font-bold text-gray-900">25 de Outubro de 2024</p>
+                                <p class="font-mono text-sm text-gray-500">09:00 - 18:00</p>
+                            </div>
+                        </div>
+
+                        <!-- Localização -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="font-mono text-gray-600">📍</span>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-gray-600">Localização</p>
+                                <p class="font-mono font-bold text-gray-900">Centro de Convenções</p>
+                                <p class="font-mono text-sm text-gray-500">
+                                    Avenida Paulista, 1234<br>
+                                    Bela Vista, São Paulo - SP<br>
+                                    CEP: 01310-100
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Carga Horária -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="font-mono text-gray-600">⏱️</span>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-gray-600">Carga Horária</p>
+                                <p class="font-mono font-bold text-gray-900">8 horas</p>
+                            </div>
+                        </div>
+
+                        <!-- Categoria -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="font-mono text-gray-600">🏷️</span>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-gray-600">Categoria</p>
+                                <p class="font-mono font-bold text-gray-900">Tecnologia</p>
+                            </div>
+                        </div>
+
+                        <!-- Limite de Participantes -->
+                        <div class="flex items-start space-x-3">
+                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="font-mono text-gray-600">👥</span>
+                            </div>
+                            <div>
+                                <p class="font-mono text-sm text-gray-600">Participantes</p>
+                                <p class="font-mono font-bold text-gray-900">150 / 200 inscritos</p>
+                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                    <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
+                                </div>
+                                <p class="font-mono text-xs text-gray-500 mt-1">75% das vagas preenchidas</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status do Evento -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Status do Evento</h3>
+                    
+                    <div class="space-y-3">
+                        <!-- Status Atual -->
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
+                            <span class="font-mono font-bold text-green-800">Evento Aberto</span>
+                            <span class="font-mono text-green-600">🔓</span>
+                        </div>
+
+                        <!-- Próximos Status -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center p-2 rounded-lg">
+                                <span class="font-mono text-sm text-gray-600">Fechado</span>
+                                <span class="font-mono text-gray-400">🔒</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded-lg">
+                                <span class="font-mono text-sm text-gray-600">Finalizado</span>
+                                <span class="font-mono text-gray-400">✅</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 rounded-lg">
+                                <span class="font-mono text-sm text-gray-600">Cancelado</span>
+                                <span class="font-mono text-gray-400">❌</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ações Rápidas -->
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Ações</h3>
+                    
+                    <div class="space-y-3">
+                        <button class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300">
+                            Participar do Evento
+                        </button>
+                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300">
+                            Compartilhar Evento
+                        </button>
+                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300">
+                            Salvar nos Favoritos
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Localização no Mapa -->
+        <div class="mt-8 bg-white rounded-2xl shadow-lg p-8">
+            <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Localização</h2>
+            <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
+                <div class="text-center">
+                    <span class="font-mono text-4xl mb-2 block">🗺️</span>
+                    <p class="font-mono text-gray-600">Mapa interativo será exibido aqui</p>
+                    <p class="font-mono text-sm text-gray-500 mt-2">Centro de Convenções - Avenida Paulista, 1234</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <p class="font-mono text-sm">&copy; 2024 Sinapse. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simulação de interação com o status do evento
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusElements = document.querySelectorAll('.bg-white.rounded-2xl.shadow-lg.p-6 .space-y-2 > div');
+            
+            statusElements.forEach(element => {
+                element.addEventListener('click', function() {
+                    // Remover destaque de todos
+                    statusElements.forEach(el => {
+                        el.classList.remove('bg-green-50', 'border', 'border-green-200');
+                        el.querySelector('span:first-child').classList.remove('font-bold', 'text-green-800');
+                        el.querySelector('span:last-child').classList.remove('text-green-600');
+                    });
+                    
+                    // Adicionar destaque ao clicado
+                    this.classList.add('bg-green-50', 'border', 'border-green-200');
+                    this.querySelector('span:first-child').classList.add('font-bold', 'text-green-800');
+                    this.querySelector('span:last-child').classList.add('text-green-600');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
