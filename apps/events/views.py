@@ -15,3 +15,8 @@ def create_event(request):
 def event_details(request, id):
     template = loader.get_template("events/event_details.html")
     return HttpResponse(template.render(None, request))
+
+
+def event_attendance_list(request, id):
+    template = loader.get_template("events/event_attendance_list.html")
+    return HttpResponse(template.render(None, request))
