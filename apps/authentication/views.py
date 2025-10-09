@@ -35,7 +35,11 @@ def register(request):
     else:
         form = CustomUserCreationForm()
 
-    return render(request, "landing_page", {"register_form": form})
+    context =  {"register_form": form}
+
+    template = loader.get_template("index.html")
+
+    return HttpResponse(template.render(context=context, request=request))
 
 
 def auth_login(request):
@@ -56,7 +60,11 @@ def auth_login(request):
         else:
             messages.error(request, "Email ou senha inválidos.")
 
-    return render(request, "landing_page.html", {"login_form": form})
+    context =  {"login_form": form}
+
+    template = loader.get_template("index.html")
+
+    return HttpResponse(template.render(context=context, request=request))
 
 
 @login_required(login_url="landing_page")
