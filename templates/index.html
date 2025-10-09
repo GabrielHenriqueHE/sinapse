@@ -1,58 +1,67 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
-{% include 'partials/_head.html' %}
+  {% include 'partials/_head.html' %}
 
-<body class="h-screen w-screen bg-white">
+  <body class="h-screen w-screen bg-white">
     <div class="app">
-        <div class="w-screen h-screen bg-[url(/static/img/hero-bg.jpg)] bg-cover bg-center bg-no-repeat">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]">
+      <div
+        class="w-screen h-screen bg-[url(/static/img/hero-bg.jpg)] bg-cover bg-center bg-no-repeat"
+      >
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+        <div class="relative z-10 flex flex-col h-full">
+          <header
+            class="w-full flex items-center justify-between bg-transparent px-4 md:px-16 py-4 md:py-8"
+          >
+            <h1
+              class="font-mono font-[100] text-2xl sm:text-3xl md:text-5xl text-white drop-shadow-xl tracking-wider align-middle"
+            >
+              SINAPSE
+            </h1>
+
+            <div class="flex space-x-2 md:space-x-3">
+              <button
+                onclick="openModal('loginModal')"
+                class="font-mono text-white border border-white/50 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-white/10 transition duration-300 text-sm md:text-base hover:cursor-pointer"
+              >
+                Entrar
+              </button>
+              <button
+                onclick="openModal('registerModal')"
+                class="font-mono bg-white text-gray-900 px-3 py-1 md:px-4 md:py-2 rounded-lg hover:bg-gray-100 transition duration-300 text-sm md:text-base hover:cursor-pointer"
+              >
+                Cadastrar
+              </button>
             </div>
-            <div class="relative z-10 flex flex-col h-full">
+          </header>
 
-                <header class="w-full flex items-center justify-between bg-transparent px-4 md:px-16 py-4 md:py-8">
-                    <h1 class="font-mono font-[100] text-2xl sm:text-3xl md:text-5xl text-white drop-shadow-xl tracking-wider align-middle">SINAPSE</h1>
-
-                    <div class="flex space-x-2 md:space-x-3">
-                        <button
-                            onclick="openModal('loginModal')"
-                            class="font-mono text-white border border-white/50 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-white/10 transition duration-300 text-sm md:text-base hover:cursor-pointer">
-                            Entrar
-                        </button>
-                        <button
-                            onclick="openModal('registerModal')"
-                            class="font-mono bg-white text-gray-900 px-3 py-1 md:px-4 md:py-2 rounded-lg hover:bg-gray-100 transition duration-300 text-sm md:text-base hover:cursor-pointer">
-                            Cadastrar
-                        </button>
-                    </div>
-                </header>
-
-                <section class="flex-grow flex items-center justify-center px-4">
-                    <div class="text-center space-y-6 md:space-y-8 max-w-4xl mx-auto">
-                        <h2
-                            class="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center drop-shadow-lg leading-tight">
-                            Conectando você a eventos incríveis!
-                        </h2>
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <button
-                                class="font-mono bg-white text-gray-900 px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg hover:cursor-pointer text-sm md:text-base">
-                                Explorar Eventos
-                            </button>
-                            <button
-                                class="font-mono border border-white text-white px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 hover:cursor-pointer text-sm md:text-base">
-                                Saiba Mais
-                            </button>
-                        </div>
-                    </div>
-                </section>
-
+          <section class="flex-grow flex items-center justify-center px-4">
+            <div class="text-center space-y-6 md:space-y-8 max-w-4xl mx-auto">
+              <h2
+                class="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center drop-shadow-lg leading-tight"
+              >
+                Conectando você a eventos incríveis!
+              </h2>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  class="font-mono bg-white text-gray-900 px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg hover:cursor-pointer text-sm md:text-base"
+                >
+                  Explorar Eventos
+                </button>
+                <button
+                  class="font-mono border border-white text-white px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 hover:cursor-pointer text-sm md:text-base"
+                >
+                  Saiba Mais
+                </button>
+              </div>
             </div>
+          </section>
         </div>
+      </div>
     </div>
 
     <div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-            
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h3 class="font-mono text-2xl text-gray-900">Entrar</h3>
                 <button onclick="closeModal('loginModal')" class="text-gray-500 hover:text-gray-700 transition duration-300 hover:cursor-pointer">
@@ -61,42 +70,61 @@
                     </svg>
                 </button>
             </div>
-            
+    
             <div class="p-6">
-                <form class="space-y-4">
+                <form method="POST" action="{% url 'login' %}" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    {% if login_form.non_field_errors %}
+                    <div class="font-mono text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                        {% for error in login_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+    
                     <div>
                         <label class="font-mono text-sm text-gray-700 block mb-2">Email</label>
-                        <input type="email" 
-                               class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                               placeholder="seu@email.com">
+                        {{ login_form.username }}
+                        {% if login_form.username.errors %}
+                        <div class="font-mono text-sm text-red-600 mt-1">
+                            {% for error in login_form.username.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
+    
                     <div>
                         <label class="font-mono text-sm text-gray-700 block mb-2">Senha</label>
-                        <input type="password" 
-                               class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                               placeholder="Sua senha">
+                        {{ login_form.password }}
+                        {% if login_form.password.errors %}
+                        <div class="font-mono text-sm text-red-600 mt-1">
+                            {% for error in login_form.password.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
+    
                     <div class="flex items-center justify-between">
                         <label class="flex items-center">
-                            <input type="checkbox" class="rounded border-gray-300 text-black focus:ring-black">
+                            {{ login_form.remember_me }}
                             <span class="font-mono text-sm text-gray-700 ml-2">Lembrar de mim</span>
                         </label>
                         <a href="#" class="font-mono text-sm text-gray-600 hover:text-black transition duration-300">
                             Esqueceu a senha?
                         </a>
                     </div>
-                    
-                    <button type="submit" 
-                            class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg hover:cursor-pointer">
+    
+                    <button type="submit" class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg hover:cursor-pointer">
                         Entrar
                     </button>
                 </form>
-                
+    
                 <div class="mt-6 text-center">
                     <p class="font-mono text-sm text-gray-600">
-                        Não tem uma conta? 
+                        Não tem uma conta?
                         <button onclick="switchToRegister()" class="text-black hover:underline font-semibold ml-1 hover:cursor-pointer">
                             Cadastre-se
                         </button>
@@ -108,7 +136,6 @@
 
     <div id="registerModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-
             <div class="flex justify-between items-center p-6 border-b border-gray-200">
                 <h3 class="font-mono text-2xl text-gray-900">Cadastrar</h3>
                 <button onclick="closeModal('registerModal')" class="text-gray-500 hover:text-gray-700 transition duration-300 hover:cursor-pointer">
@@ -117,62 +144,103 @@
                     </svg>
                 </button>
             </div>
-            
+    
             <div class="p-6">
-                <form class="space-y-4">
+                <form method="POST" action="{% url 'register' %}" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    {% if register_form.non_field_errors %}
+                    <div class="font-mono text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                        {% for error in register_form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+    
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="font-mono text-sm text-gray-700 block mb-2">Nome</label>
-                            <input type="text" 
-                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                                   placeholder="Seu nome">
+                            {{ register_form.first_name }}
+                            {% if register_form.first_name.errors %}
+                            <div class="font-mono text-sm text-red-600 mt-1">
+                                {% for error in register_form.first_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                         <div>
                             <label class="font-mono text-sm text-gray-700 block mb-2">Sobrenome</label>
-                            <input type="text" 
-                                   class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                                   placeholder="Seu sobrenome">
+                            {{ register_form.last_name }}
+                            {% if register_form.last_name.errors %}
+                            <div class="font-mono text-sm text-red-600 mt-1">
+                                {% for error in register_form.last_name.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
-                    
+    
                     <div>
                         <label class="font-mono text-sm text-gray-700 block mb-2">Email</label>
-                        <input type="email" 
-                               class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                               placeholder="seu@email.com">
+                        {{ register_form.email }}
+                        {% if register_form.email.errors %}
+                        <div class="font-mono text-sm text-red-600 mt-1">
+                            {% for error in register_form.email.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
+    
                     <div>
                         <label class="font-mono text-sm text-gray-700 block mb-2">Senha</label>
-                        <input type="password" 
-                               class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                               placeholder="Crie uma senha">
+                        {{ register_form.password1 }}
+                        {% if register_form.password1.errors %}
+                        <div class="font-mono text-sm text-red-600 mt-1">
+                            {% for error in register_form.password1.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
+    
                     <div>
                         <label class="font-mono text-sm text-gray-700 block mb-2">Confirmar Senha</label>
-                        <input type="password" 
-                               class="font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300"
-                               placeholder="Confirme sua senha">
+                        {{ register_form.password2 }}
+                        {% if register_form.password2.errors %}
+                        <div class="font-mono text-sm text-red-600 mt-1">
+                            {% for error in register_form.password2.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
                     </div>
-                    
+    
                     <label class="flex items-start">
-                        <input type="checkbox" class="rounded border-gray-300 text-black focus:ring-black mt-1">
+                        {{ register_form.terms }}
                         <span class="font-mono text-sm text-gray-700 ml-2">
                             Concordo com os <a href="#" class="text-black hover:underline">Termos de Serviço</a> 
                             e <a href="#" class="text-black hover:underline">Política de Privacidade</a>
                         </span>
                     </label>
-                    
-                    <button type="submit" 
-                            class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg">
+                    {% if register_form.terms.errors %}
+                    <div class="font-mono text-sm text-red-600 mt-1">
+                        {% for error in register_form.terms.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+    
+                    <button type="submit" class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg" id="form-create-account-submit-btn">
                         Criar Conta
                     </button>
                 </form>
-                
+    
                 <div class="mt-6 text-center">
                     <p class="font-mono text-sm text-gray-600">
-                        Já tem uma conta? 
+                        Já tem uma conta?
                         <button onclick="switchToLogin()" class="text-black hover:underline font-semibold ml-1 hover:cursor-pointer">
                             Fazer Login
                         </button>
@@ -181,5 +249,5 @@
             </div>
         </div>
     </div>
-</body>
+  </body>
 </html>
