@@ -35,7 +35,7 @@ def register(request):
     else:
         form = CustomUserCreationForm()
 
-    context =  {"register_form": form}
+    context = {"register_form": form}
 
     template = loader.get_template("index.html")
 
@@ -60,7 +60,7 @@ def auth_login(request):
         else:
             messages.error(request, "Email ou senha inválidos.")
 
-    context =  {"login_form": form}
+    context = {"login_form": form}
 
     template = loader.get_template("index.html")
 

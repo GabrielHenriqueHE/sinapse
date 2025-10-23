@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
+from django.utils.translation import gettext_lazy as _
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-5enaj_2x=c7y27g20%b-gek%m(3)m1$7w4+9l2ri)snrd3)7a1"
@@ -91,6 +93,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "pt-br"
+
+LANGUAGES = [
+    ("pt-br", _("Português Brasileiro")),
+    ("en", _("English")),
+]
 
 TIME_ZONE = "America/Sao_Paulo"
 
