@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sinapse - Seu portal para eventos incríveis!</title>
+  
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,4 +31,38 @@
       },
     };
   </script>
+
+<style>
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-container {
+    scroll-behavior: smooth;
+  }
+
+  .event-card {
+    flex: 0 0 auto;
+    transition: transform 0.3s ease;
+  }
+
+  .event-card:hover {
+    transform: scale(1.01);
+  }
+
+  /* Efeito de desbotamento para eventos fechados */
+  .event-closed {
+    opacity: 0.7;
+    filter: grayscale(0.3);
+  }
+
+  .event-closed:hover {
+    opacity: 0.9;
+    filter: grayscale(0.1);
+  }
+</style>
 </head>

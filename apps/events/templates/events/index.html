@@ -1,114 +1,13 @@
 {% load static %}
 <!DOCTYPE html>
+
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Eventos - Sinapse</title>
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              mono: ["Roboto Mono", "monospace"],
-            },
-          },
-        },
-      };
-    </script>
-
-    <style>
-      .scrollbar-hide {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .scrollbar-hide::-webkit-scrollbar {
-        display: none;
-      }
-
-      .carousel-container {
-        scroll-behavior: smooth;
-      }
-
-      .event-card {
-        flex: 0 0 auto;
-        transition: transform 0.3s ease;
-      }
-
-      .event-card:hover {
-        transform: scale(1.01);
-      }
-
-      /* Efeito de desbotamento para eventos fechados */
-      .event-closed {
-        opacity: 0.7;
-        filter: grayscale(0.3);
-      }
-
-      .event-closed:hover {
-        opacity: 0.9;
-        filter: grayscale(0.1);
-      }
-    </style>
-  </head>
-
+  {% include 'partials/_head.html' %}
+  <title>Eventos - Sinapse</title>
+      
   <body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <!-- Logo -->
-          <div class="flex items-center">
-            <h1 class="font-mono text-2xl font-bold text-gray-900">SINAPSE</h1>
-          </div>
-
-          <!-- Navigation -->
-          <nav class="hidden md:flex space-x-8">
-            <a
-              href="#"
-              class="font-mono text-gray-900 hover:text-gray-600 transition duration-300"
-              >Eventos</a
-            >
-            <a
-              href="#"
-              class="font-mono text-gray-500 hover:text-gray-600 transition duration-300"
-              >Categorias</a
-            >
-            <a
-              href="{% url 'create_event' %}"
-              class="font-mono text-gray-500 hover:text-gray-600 transition duration-300"
-              >Criar Evento</a
-            >
-          </nav>
-
-          <!-- User Actions -->
-          <div class="flex items-center space-x-4">
-            <button
-              class="font-mono text-gray-700 hover:text-gray-900 transition duration-300"
-            >
-              Pesquisar
-            </button>
-            <div class="flex items-center space-x-3">
-              <span class="font-mono text-gray-700">Olá, Organizador!</span>
-              <div
-                class="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full"
-              ></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
+      <!-- Header -->
+      {% include 'partials/_header.html' %}
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Seção: Meus Eventos -->

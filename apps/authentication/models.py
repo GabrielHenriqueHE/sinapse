@@ -9,8 +9,8 @@ from apps.core.models import BaseModel
 class UserModel(AbstractUser, BaseModel):
 
     class Role(models.TextChoices):
-        STUDENT = "STUDENT", _("Student")
-        TEACHER = "TEACHER", _("Teacher")
+        STUDENT = "STUDENT", _("Estudante")
+        TEACHER = "TEACHER", _("Professor")
 
     username = None
 
