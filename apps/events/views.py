@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
 
+from apps.authentication.decorators import student_only, teacher_only
 from apps.events.forms import EventForm
 from apps.events.models import EventModel
 
@@ -15,6 +16,7 @@ def events(request):
 
 
 @login_required(login_url="landing_page")
+@teacher_only
 def create_event(request):
     if request.method == "POST":
         form = EventForm(request.POST)
@@ -27,7 +29,6 @@ def create_event(request):
             event.save()
 
             return redirect("events_index")
-
 
     context = {"form": EventForm()}
     template = loader.get_template("events/create_event.html")
