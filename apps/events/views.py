@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +10,7 @@ from apps.events.forms import EventForm
 from apps.events.models import EventModel
 
 
-def events(request):
+def events(request: HttpRequest):
     template = loader.get_template("events/index.html")
     return HttpResponse(template.render(None, request))
 

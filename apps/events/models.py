@@ -55,7 +55,9 @@ class EventModel(BaseModel):
     start_date = models.DateTimeField(null=False, verbose_name=_("Data de início"))
     end_date = models.DateTimeField(null=False, verbose_name=_("Data de término"))
 
-    status = models.CharField(null=False, choices=Status.choices, default=Status.OPEN)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.OPEN
+    )
 
     participants_limit = models.IntegerField(
         null=True, verbose_name=_("Limite de participantes")
@@ -67,7 +69,7 @@ class EventModel(BaseModel):
 
     category = models.ForeignKey(
         CategoryModel,
-        related_name="categories",
+        related_name="events",
         on_delete=models.CASCADE,
         null=False,
         verbose_name=_("Categoria"),
@@ -75,11 +77,50 @@ class EventModel(BaseModel):
 
     user = models.ForeignKey(
         UserModel,
-        related_name="users",
+        related_name="created_events",
         on_delete=models.CASCADE,
         null=False,
         verbose_name=_("Usuário"),
     )
 
+    participants = models.ManyToManyField(
+        to=UserModel,
+        through="EventParticipantModel",
+        through_fields=("event", "user"),
+        related_name="participated_events",
+    )
+
     class Meta:
         db_table = "tb_events"
+
+    def __str__(self):
+        return self.name
+
+
+class EventParticipantModel(BaseModel):
+    user = models.ForeignKey(
+        UserModel, on_delete=models.CASCADE, related_name="event_participations"
+    )
+    event = models.ForeignKey(
+        EventModel, on_delete=models.CASCADE, related_name="event_participants"
+    )
+
+    joined_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("PENDING", _("Pendente")),
+            ("CONFIRMED", _("Confirmado")),
+            ("CANCELLED", _("Cancelado")),
+        ],
+        default="PENDING",
+    )
+
+    class Meta:
+        db_table = "tb_events_participants"
+        unique_together = ["user", "event"]
+        verbose_name = _("Event Participant")
+        verbose_name_plural = _("Event Participants")
+
+    def __str__(self):
+        return f"{self.user} - {self.event}"
