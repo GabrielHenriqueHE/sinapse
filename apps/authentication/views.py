@@ -9,20 +9,19 @@ from apps.authentication.forms import CustomAuthenticationForm, CustomUserCreati
 
 
 def landing_page(request):
-    register_form = CustomUserCreationForm()
-    login_form = CustomAuthenticationForm()
-
-    context = {
-        "register_form": register_form,
-        "login_form": login_form,
-    }
+    """Página inicial da aplicação"""
+    if request.user.is_authenticated:
+        return redirect("events_index")
 
     template = loader.get_template("index.html")
-
-    return HttpResponse(template.render(context=context, request=request))
+    return HttpResponse(template.render(request=request))
 
 
 def register(request):
+    """View para cadastro de novos usuários"""
+    if request.user.is_authenticated:
+        return redirect("events_index")
+
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
@@ -35,14 +34,16 @@ def register(request):
     else:
         form = CustomUserCreationForm()
 
-    context = {"register_form": form}
-
-    template = loader.get_template("index.html")
-
+    context = {"form": form}
+    template = loader.get_template("register.html")
     return HttpResponse(template.render(context=context, request=request))
 
 
 def auth_login(request):
+    """View para autenticação de usuários"""
+    if request.user.is_authenticated:
+        return redirect("events_index")
+
     if request.method == "POST":
         form = CustomAuthenticationForm(request, data=request.POST)
         if form.is_valid():
@@ -59,15 +60,17 @@ def auth_login(request):
                 return redirect("events_index")
         else:
             messages.error(request, "Email ou senha inválidos.")
+    else:
+        form = CustomAuthenticationForm()
 
-    context = {"login_form": form}
-
-    template = loader.get_template("index.html")
-
+    context = {"form": form}
+    template = loader.get_template("login.html")
     return HttpResponse(template.render(context=context, request=request))
 
 
 @login_required(login_url="landing_page")
 def logout_user(request):
+    """View para logout de usuários"""
     logout(request)
+    messages.success(request, "Você foi desconectado com sucesso.")
     return redirect("landing_page")

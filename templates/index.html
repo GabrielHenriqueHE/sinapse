@@ -1,253 +1,248 @@
+{% extends 'partials/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-  {% include 'partials/_head.html' %}
 
-  <body class="h-screen w-screen bg-white">
-    <div class="app">
-      <div
-        class="w-screen h-screen bg-[url(/static/img/hero-bg.jpg)] bg-cover bg-center bg-no-repeat"
-      >
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
-        <div class="relative z-10 flex flex-col h-full">
-          <header
-            class="w-full flex items-center justify-between bg-transparent px-4 md:px-16 py-4 md:py-8"
-          >
-            <h1
-              class="font-mono font-[100] text-2xl sm:text-3xl md:text-5xl text-white drop-shadow-xl tracking-wider align-middle"
-            >
-              SINAPSE
-            </h1>
+{% block title %}Sinapse - Conectando Pessoas através de Eventos{% endblock %}
 
-            <div class="flex space-x-2 md:space-x-3">
-              <button
-                onclick="openModal('loginModal')"
-                class="font-mono text-white border border-white/50 px-3 py-1 md:px-4 md:py-2 rounded hover:bg-white/10 transition duration-300 text-sm md:text-base hover:cursor-pointer"
-              >
-                Entrar
-              </button>
-              <button
-                onclick="openModal('registerModal')"
-                class="font-mono bg-white text-gray-900 px-3 py-1 md:px-4 md:py-2 rounded-lg hover:bg-gray-100 transition duration-300 text-sm md:text-base hover:cursor-pointer"
-              >
-                Cadastrar
-              </button>
+{% block content %}
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col lg:flex-row items-center justify-between">
+                <div class="lg:w-1/2 mb-12 lg:mb-0">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                        Conecte-se através de <span class="text-yellow-300">eventos</span> incríveis
+                    </h1>
+                    <p class="text-xl text-white/90 mb-8 max-w-2xl">
+                        A plataforma que une organizadores e participantes em experiências únicas e memoráveis.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'events_index' %}" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg text-center font-semibold">
+                                Explorar Eventos
+                            </a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="bg-white text-purple-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg text-center font-semibold">
+                                Começar Agora
+                            </a>
+                            <a href="{% url 'login' %}" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white/10 transition duration-300 text-center">
+                                Fazer Login
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="lg:w-1/2 flex justify-center">
+                    <div class="relative w-full max-w-lg">
+                        <div class="absolute -top-6 -left-6 w-72 h-72 bg-white/10 rounded-full blur-xl"></div>
+                        <div class="absolute -bottom-6 -right-6 w-72 h-72 bg-white/5 rounded-full blur-xl"></div>
+                        
+                        <div class="relative bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div class="bg-white/20 p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold mb-2">1.2K+</div>
+                                    <div class="text-sm text-white/80">Eventos Criados</div>
+                                </div>
+                                <div class="bg-white/20 p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold mb-2">50K+</div>
+                                    <div class="text-sm text-white/80">Participantes</div>
+                                </div>
+                                <div class="bg-white/20 p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold mb-2">98%</div>
+                                    <div class="text-sm text-white/80">Taxa de Sucesso</div>
+                                </div>
+                                <div class="bg-white/20 p-6 rounded-xl text-center">
+                                    <div class="text-3xl font-bold mb-2">4.9</div>
+                                    <div class="text-sm text-white/80">Avaliação</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </header>
-
-          <section class="flex-grow flex items-center justify-center px-4">
-            <div class="text-center space-y-6 md:space-y-8 max-w-4xl mx-auto">
-              <h2
-                class="font-mono text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center drop-shadow-lg leading-tight"
-              >
-                Conectando você a eventos incríveis!
-              </h2>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  class="font-mono bg-white text-gray-900 px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg hover:cursor-pointer text-sm md:text-base"
-                >
-                  Explorar Eventos
-                </button>
-                <button
-                  class="font-mono border border-white text-white px-6 py-3 md:px-8 md:py-4 rounded-lg hover:bg-white hover:text-gray-900 transition duration-300 hover:cursor-pointer text-sm md:text-base"
-                >
-                  Saiba Mais
-                </button>
-              </div>
-            </div>
-          </section>
         </div>
-      </div>
-    </div>
+    </section>
 
-    <div id="loginModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-            <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h3 class="font-mono text-2xl text-gray-900">Entrar</h3>
-                <button onclick="closeModal('loginModal')" class="text-gray-500 hover:text-gray-700 transition duration-300 hover:cursor-pointer">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    Por que escolher a Sinapse?
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Uma plataforma completa para criar, gerenciar e participar dos melhores eventos
+                </p>
             </div>
-    
-            <div class="p-6">
-                <form method="POST" action="{% url 'login' %}" class="space-y-4">
-                    {% csrf_token %}
-                    
-                    {% if login_form.non_field_errors %}
-                    <div class="font-mono text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-                        {% for error in login_form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Feature 1 -->
+                <div class="bg-gray-50 p-8 rounded-2xl card-hover">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
                     </div>
-                    {% endif %}
-    
-                    <div>
-                        <label class="font-mono text-sm text-gray-700 block mb-2">Email</label>
-                        {{ login_form.username }}
-                        {% if login_form.username.errors %}
-                        <div class="font-mono text-sm text-red-600 mt-1">
-                            {% for error in login_form.username.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Eventos Seguros</h3>
+                    <p class="text-gray-600">
+                        Garantimos a segurança de todos os participantes com verificação de identidade e sistemas de pagamento confiáveis.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-gray-50 p-8 rounded-2xl card-hover">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-teal-500 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
                     </div>
-    
-                    <div>
-                        <label class="font-mono text-sm text-gray-700 block mb-2">Senha</label>
-                        {{ login_form.password }}
-                        {% if login_form.password.errors %}
-                        <div class="font-mono text-sm text-red-600 mt-1">
-                            {% for error in login_form.password.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Processo Rápido</h3>
+                    <p class="text-gray-600">
+                        Crie eventos em minutos com nosso sistema intuitivo. Gestão simplificada de inscrições e pagamentos.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-gray-50 p-8 rounded-2xl card-hover">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
                     </div>
-    
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center">
-                            {{ login_form.remember_me }}
-                            <span class="font-mono text-sm text-gray-700 ml-2">Lembrar de mim</span>
-                        </label>
-                        <a href="#" class="font-mono text-sm text-gray-600 hover:text-black transition duration-300">
-                            Esqueceu a senha?
-                        </a>
-                    </div>
-    
-                    <button type="submit" class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg hover:cursor-pointer">
-                        Entrar
-                    </button>
-                </form>
-    
-                <div class="mt-6 text-center">
-                    <p class="font-mono text-sm text-gray-600">
-                        Não tem uma conta?
-                        <button onclick="switchToRegister()" class="text-black hover:underline font-semibold ml-1 hover:cursor-pointer">
-                            Cadastre-se
-                        </button>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Comunidade Ativa</h3>
+                    <p class="text-gray-600">
+                        Conecte-se com milhares de pessoas interessadas nos mesmos temas que você.
                     </p>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div id="registerModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 transform transition-all">
-            <div class="flex justify-between items-center p-6 border-b border-gray-200">
-                <h3 class="font-mono text-2xl text-gray-900">Cadastrar</h3>
-                <button onclick="closeModal('registerModal')" class="text-gray-500 hover:text-gray-700 transition duration-300 hover:cursor-pointer">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
+    <!-- Events Preview -->
+    <section id="events" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                    Eventos em Destaque
+                </h2>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                    Descubra os eventos mais populares da nossa comunidade
+                </p>
             </div>
-    
-            <div class="p-6">
-                <form method="POST" action="{% url 'register' %}" class="space-y-4">
-                    {% csrf_token %}
-                    
-                    {% if register_form.non_field_errors %}
-                    <div class="font-mono text-sm text-red-600 bg-red-50 p-3 rounded-lg">
-                        {% for error in register_form.non_field_errors %}
-                            {{ error }}
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="font-mono text-sm text-gray-700 block mb-2">Nome</label>
-                            {{ register_form.first_name }}
-                            {% if register_form.first_name.errors %}
-                            <div class="font-mono text-sm text-red-600 mt-1">
-                                {% for error in register_form.first_name.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div>
-                            <label class="font-mono text-sm text-gray-700 block mb-2">Sobrenome</label>
-                            {{ register_form.last_name }}
-                            {% if register_form.last_name.errors %}
-                            <div class="font-mono text-sm text-red-600 mt-1">
-                                {% for error in register_form.last_name.errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-    
-                    <div>
-                        <label class="font-mono text-sm text-gray-700 block mb-2">Email</label>
-                        {{ register_form.email }}
-                        {% if register_form.email.errors %}
-                        <div class="font-mono text-sm text-red-600 mt-1">
-                            {% for error in register_form.email.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-    
-                    <div>
-                        <label class="font-mono text-sm text-gray-700 block mb-2">Senha</label>
-                        {{ register_form.password1 }}
-                        {% if register_form.password1.errors %}
-                        <div class="font-mono text-sm text-red-600 mt-1">
-                            {% for error in register_form.password1.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-    
-                    <div>
-                        <label class="font-mono text-sm text-gray-700 block mb-2">Confirmar Senha</label>
-                        {{ register_form.password2 }}
-                        {% if register_form.password2.errors %}
-                        <div class="font-mono text-sm text-red-600 mt-1">
-                            {% for error in register_form.password2.errors %}
-                                {{ error }}
-                            {% endfor %}
-                        </div>
-                        {% endif %}
-                    </div>
-    
-                    <label class="flex items-start">
-                        {{ register_form.terms }}
-                        <span class="font-mono text-sm text-gray-700 ml-2">
-                            Concordo com os <a href="#" class="text-black hover:underline">Termos de Serviço</a> 
-                            e <a href="#" class="text-black hover:underline">Política de Privacidade</a>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Event 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover">
+                    <div class="h-48 bg-gradient-to-br from-purple-500 to-pink-500 relative">
+                        <span class="absolute top-4 right-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+                            Tecnologia
                         </span>
-                    </label>
-                    {% if register_form.terms.errors %}
-                    <div class="font-mono text-sm text-red-600 mt-1">
-                        {% for error in register_form.terms.errors %}
-                            {{ error }}
-                        {% endfor %}
                     </div>
-                    {% endif %}
-    
-                    <button type="submit" class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300 shadow-lg" id="form-create-account-submit-btn">
-                        Criar Conta
-                    </button>
-                </form>
-    
-                <div class="mt-6 text-center">
-                    <p class="font-mono text-sm text-gray-600">
-                        Já tem uma conta?
-                        <button onclick="switchToLogin()" class="text-black hover:underline font-semibold ml-1 hover:cursor-pointer">
-                            Fazer Login
-                        </button>
-                    </p>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Tech Conference 2024</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-2">
+                            A maior conferência de tecnologia do ano com os melhores especialistas da indústria.
+                        </p>
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span>📅 25 Out</span>
+                            <span>📍 São Paulo</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-semibold">Inscrições Abertas</span>
+                            <button class="btn-primary text-white px-4 py-2 rounded-lg text-sm">
+                                Participar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover">
+                    <div class="h-48 bg-gradient-to-br from-blue-500 to-cyan-500 relative">
+                        <span class="absolute top-4 right-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+                            Música
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Festival de Verão</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-2">
+                            Três dias de música com artistas nacionais e internacionais no coração da cidade.
+                        </p>
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span>📅 15 Dez</span>
+                            <span>📍 Rio de Janeiro</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-semibold">Vagas Disponíveis</span>
+                            <button class="btn-primary text-white px-4 py-2 rounded-lg text-sm">
+                                Participar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-sm card-hover">
+                    <div class="h-48 bg-gradient-to-br from-orange-500 to-red-500 relative">
+                        <span class="absolute top-4 right-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+                            Arte
+                        </span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Exposição Moderna</h3>
+                        <p class="text-gray-600 mb-4 line-clamp-2">
+                            Arte contemporânea de artistas emergentes em uma galeria exclusiva.
+                        </p>
+                        <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <span>📅 30 Out</span>
+                            <span>📍 Belo Horizonte</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-green-600 font-semibold">Entrada Livre</span>
+                            <button class="btn-primary text-white px-4 py-2 rounded-lg text-sm">
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <div class="text-center mt-12">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'events_index' %}" class="btn-primary text-white px-8 py-3 rounded-lg inline-block">
+                        Ver Todos os Eventos
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="btn-primary text-white px-8 py-3 rounded-lg inline-block">
+                        Descobrir Mais Eventos
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    </div>
-  </body>
-</html>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">
+                Pronto para começar?
+            </h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">
+                Junte-se a milhares de pessoas que já estão criando e participando de eventos incríveis
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'events_index' %}" class="bg-white text-purple-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg font-semibold">
+                        Explorar Eventos
+                    </a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="bg-white text-purple-600 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg font-semibold">
+                        Criar Minha Conta
+                    </a>
+                    <a href="{% url 'login' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white/10 transition duration-300">
+                        Fazer Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

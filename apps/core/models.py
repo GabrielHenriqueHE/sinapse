@@ -9,7 +9,7 @@ class BaseModel(models.Model):
     id: type[Field] = models.UUIDField(primary_key=True, default=uuid.uuid4)
     created_at: type[Field] = models.DateTimeField(null=False, auto_now_add=True)
     updated_at: type[Field] = models.DateTimeField(null=False, auto_now=True)
-    deleted_at: type[Field] = models.DateTimeField(null=True)
+    deleted_at: type[Field] = models.DateTimeField(null=True, blank=True)
     deleted: type[Field] = models.BooleanField(default=False)
 
     class Meta:

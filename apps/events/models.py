@@ -1,5 +1,7 @@
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from apps.authentication.models import UserModel
@@ -7,13 +9,26 @@ from apps.core.models import BaseModel
 
 
 class CategoryModel(BaseModel):
-    name = models.CharField(null=False, max_length=100)
+    name = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        unique=True,
+        verbose_name=_("Nome da categoria"),
+    )
 
     class Meta:
         db_table = "tb_category"
+        verbose_name = _("Categoria")
+        verbose_name_plural = _("Categorias")
 
     def __str__(self):
         return self.name.capitalize()
+
+    def clean(self):
+        if self.name:
+            self.name = self.name.strip().lower()
+        super().clean()
 
 
 class EventModel(BaseModel):
@@ -25,46 +40,69 @@ class EventModel(BaseModel):
         CANCELED = "CANCELED", _("Cancelado")
 
     name = models.CharField(
-        max_length=100, null=False, verbose_name=_("Nome do evento")
+        max_length=100, null=False, blank=False, verbose_name=_("Nome do evento")
     )
 
     description = models.CharField(
-        max_length=300, null=True, verbose_name=_("Descrição")
+        max_length=300, null=True, blank=True, verbose_name=_("Descrição")
     )
 
     topics = ArrayField(
-        models.CharField(max_length=100, blank=False), verbose_name=_("Tópicos")
+        models.CharField(max_length=100, blank=False),
+        blank=True,
+        default=list,
+        verbose_name=_("Tópicos"),
     )
 
-    street = models.CharField(max_length=255, null=False, verbose_name=_("Logradouro"))
+    street = models.CharField(
+        max_length=255, null=False, blank=False, verbose_name=_("Logradouro")
+    )
 
     complement = models.CharField(
-        max_length=100, null=True, verbose_name=_("Complemento")
+        max_length=100, null=True, blank=True, verbose_name=_("Complemento")
     )
 
-    city = models.CharField(max_length=100, null=False, verbose_name=_("Cidade"))
+    city = models.CharField(
+        max_length=100, null=False, blank=False, verbose_name=_("Cidade")
+    )
 
-    state = models.CharField(max_length=100, null=False, verbose_name=_("Estado"))
+    state = models.CharField(
+        max_length=100, null=False, blank=False, verbose_name=_("Estado")
+    )
 
-    country = models.CharField(max_length=100, null=False, verbose_name=_("País"))
+    country = models.CharField(
+        max_length=100,
+        null=False,
+        blank=False,
+        default="Brasil",
+        verbose_name=_("País"),
+    )
 
     zip_code = models.CharField(
-        max_length=8, null=False, verbose_name=_("Código postal")
+        max_length=20, null=False, blank=False, verbose_name=_("Código postal")
     )
 
-    start_date = models.DateTimeField(null=False, verbose_name=_("Data de início"))
-    end_date = models.DateTimeField(null=False, verbose_name=_("Data de término"))
+    start_date = models.DateTimeField(
+        null=False, blank=False, verbose_name=_("Data de início")
+    )
+
+    end_date = models.DateTimeField(
+        null=False, blank=False, verbose_name=_("Data de término")
+    )
 
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.OPEN
+        max_length=20,
+        choices=Status.choices,
+        default=Status.OPEN,
+        verbose_name=_("Status"),
     )
 
     participants_limit = models.IntegerField(
-        null=True, verbose_name=_("Limite de participantes")
+        null=True, blank=True, verbose_name=_("Limite de participantes")
     )
 
-    image_url = models.CharField(
-        null=True, max_length=500, verbose_name=_("URL da imagem")
+    image_url = models.URLField(
+        null=True, blank=True, max_length=500, verbose_name=_("URL da imagem")
     )
 
     category = models.ForeignKey(
@@ -72,6 +110,7 @@ class EventModel(BaseModel):
         related_name="events",
         on_delete=models.CASCADE,
         null=False,
+        blank=False,
         verbose_name=_("Categoria"),
     )
 
@@ -80,7 +119,8 @@ class EventModel(BaseModel):
         related_name="created_events",
         on_delete=models.CASCADE,
         null=False,
-        verbose_name=_("Usuário"),
+        blank=False,
+        verbose_name=_("Criador do evento"),
     )
 
     participants = models.ManyToManyField(
@@ -88,39 +128,105 @@ class EventModel(BaseModel):
         through="EventParticipantModel",
         through_fields=("event", "user"),
         related_name="participated_events",
+        verbose_name=_("Participantes"),
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "tb_events"
+        verbose_name = _("Evento")
+        verbose_name_plural = _("Eventos")
+        indexes = [
+            models.Index(fields=["start_date", "end_date"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["category"]),
+        ]
 
     def __str__(self):
         return self.name
 
+    def clean(self):
+        if self.start_date and self.end_date:
+            if self.start_date >= self.end_date:
+                raise ValidationError(
+                    _("A data de término deve ser posterior à data de início")
+                )
+
+            if self.start_date < timezone.now():
+                raise ValidationError(_("A data de início não pode ser no passado"))
+
+        if self.participants_limit and self.participants_limit < 1:
+            raise ValidationError(
+                _("O limite de participantes deve ser maior que zero")
+            )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    @property
+    def is_full(self):
+        if not self.participants_limit:
+            return False
+        return self.participants.count() >= self.participants_limit
+
+    @property
+    def available_spots(self):
+        if not self.participants_limit:
+            return None
+        return max(0, self.participants_limit - self.participants.count())
+
 
 class EventParticipantModel(BaseModel):
+
+    class ParticipationStatus(models.TextChoices):
+        PRESENT = "PRESENT", _("Presente")
+        ABSENT = "ABSENT", _("Ausente")
+
     user = models.ForeignKey(
-        UserModel, on_delete=models.CASCADE, related_name="event_participations"
-    )
-    event = models.ForeignKey(
-        EventModel, on_delete=models.CASCADE, related_name="event_participants"
+        UserModel,
+        on_delete=models.CASCADE,
+        related_name="event_participations",
+        verbose_name=_("Usuário"),
     )
 
-    joined_at = models.DateTimeField(auto_now_add=True)
+    event = models.ForeignKey(
+        EventModel,
+        on_delete=models.CASCADE,
+        related_name="participants_records",
+        verbose_name=_("Evento"),
+    )
+
     status = models.CharField(
         max_length=20,
-        choices=[
-            ("PENDING", _("Pendente")),
-            ("CONFIRMED", _("Confirmado")),
-            ("CANCELLED", _("Cancelado")),
-        ],
-        default="PENDING",
+        choices=ParticipationStatus.choices,
+        null=True,
+        verbose_name=_("Status da participação"),
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "tb_events_participants"
         unique_together = ["user", "event"]
-        verbose_name = _("Event Participant")
-        verbose_name_plural = _("Event Participants")
+        verbose_name = _("Participante do Evento")
+        verbose_name_plural = _("Participantes dos Eventos")
 
     def __str__(self):
         return f"{self.user} - {self.event}"
+
+    def clean(self):
+        if self.event and self.user:
+
+            if self.event.user == self.user:
+                raise ValidationError(
+                    _("O criador do evento não pode se inscrever como participante")
+                )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+
+        super().save(*args, **kwargs)
