@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -83,8 +83,67 @@ def create_event(request):
 
 
 def event_details(request, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return (
+            HttpResponseNotFound()
+        )  # TODO: adicionar redirect para uma view user-friendly
+
+    context = {"event": event}
+
     template = loader.get_template("events/event_details.html")
-    return HttpResponse(template.render(None, request))
+    return HttpResponse(template.render(context=context, request=request))
+
+
+@login_required
+@student_only
+def enroll_event(request, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return (
+            HttpResponseNotFound()
+        )  # TODO: adicionar redirect para uma view user-friendly
+
+    if event.status != EventModel.Status.OPEN:
+        messages.error(
+            request=request, message=_("Este evento não está aceitando inscrições.")
+        )
+        return redirect(to="event_details", id=id)
+
+    if event.is_full:
+        messages.error(request=request, message=_("Este evento está lotado."))
+        return redirect(to="event_details", id=id)
+
+    if request.user in event.participants.all():
+        messages.info(request=request, message=_("Você já está inscrito neste evento."))
+
+    event.participants.add(request.user)
+    messages.success(request=request, message=_("Inscrição realizada com sucesso!"))
+
+    return redirect(to="event_details", id=id)
+
+
+@login_required
+@student_only
+def cancel_enrollment(request, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return (
+            HttpResponseNotFound()
+        )  # TODO: adicionar redirect para uma view user-friendly
+
+    if request.user not in event.participants.all():
+        messages.error(
+            request=request, message=_("Você não estava inscrito neste evento.")
+        )
+
+    event.participants.remove(request.user)
+    messages.success(request=request, message=_("Inscrição cancelada com sucesso."))
+
+    return redirect(to="event_details", id=id)
 
 
 def event_attendance_list(request, id):

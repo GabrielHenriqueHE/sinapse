@@ -6,9 +6,8 @@ urlpatterns = [
     path("", views.events, name="events_index"),
     path("create", views.create_event, name="create_event"),
     path("<uuid:id>", views.event_details, name="event_details"),
+    path("<uuid:id>/enroll", views.enroll_event, name="enroll_event"),
     path(
-        "<uuid:id>/attendance-list",
-        views.event_attendance_list,
-        name="event_attendance_list",
+        "<uuid:id>/cancel_enrollment", views.cancel_enrollment, name="cancel_enrollment"
     ),
 ]
