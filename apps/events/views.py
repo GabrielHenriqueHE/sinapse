@@ -54,14 +54,11 @@ def create_event(request):
 
         if form.is_valid():
             try:
-                # Criar o objeto evento sem salvar ainda
                 event = form.save(commit=False)
 
-                # Definir os campos que não estão no formulário
                 event.user = request.user
                 event.status = EventModel.Status.OPEN
 
-                # Salvar o evento
                 event.save()
 
                 messages.success(request, "Evento criado com sucesso!")
@@ -71,7 +68,6 @@ def create_event(request):
                 print(e)
                 messages.error(request, f"Erro ao criar evento: {str(e)}")
         else:
-            # Debug: mostrar erros do formulário no console
             print("Form errors:", form.errors)
             messages.error(request, "Por favor, corrija os erros no formulário.")
     else:
@@ -96,7 +92,7 @@ def event_details(request, id):
     return HttpResponse(template.render(context=context, request=request))
 
 
-@login_required
+@login_required(login_url="landing_page")
 @student_only
 def enroll_event(request, id):
     event = EventModel.objects.filter(id=id).first()
@@ -125,7 +121,7 @@ def enroll_event(request, id):
     return redirect(to="event_details", id=id)
 
 
-@login_required
+@login_required(login_url="landing_page")
 @student_only
 def cancel_enrollment(request, id):
     event = EventModel.objects.filter(id=id).first()
@@ -144,6 +140,103 @@ def cancel_enrollment(request, id):
     messages.success(request=request, message=_("Inscrição cancelada com sucesso."))
 
     return redirect(to="event_details", id=id)
+
+
+@login_required(login_url="landing_page")
+@teacher_only
+def edit_event(request: HttpRequest, id: int):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return HttpResponseNotFound()
+
+    if request.user != event.user:
+        messages.error(request, "Você não tem permissão para editar este evento.")
+        return redirect("event_details", id=id)
+
+    if request.method == "POST":
+        form = EventForm(request.POST, instance=event)
+
+        if form.is_valid():
+            try:
+                updated = form.save(commit=False)
+
+                status = request.POST.get("status")
+                if status in dict(EventModel.Status.choices):
+                    updated.status = status
+
+                if event.start_date > timezone.now():
+                    if updated.start_date and updated.end_date:
+                        if updated.start_date >= updated.end_date:
+                            messages.error(
+                                request,
+                                "A data de término deve ser posterior à data de início.",
+                            )
+                            context = {"form": form, "event": event}
+                            template = loader.get_template("events/edit_event.html")
+                            return HttpResponse(template.render(context, request))
+
+                if (
+                    updated.participants_limit is not None
+                    and updated.participants_limit < event.participants.count()
+                ):
+                    messages.error(
+                        request,
+                        f"Não é possível definir o limite para {updated.participants_limit} "
+                        f"porque o evento já tem {event.participants.count()} participantes.",
+                    )
+                    context = {"form": form, "event": event}
+                    template = loader.get_template("events/edit_event.html")
+                    return HttpResponse(template.render(context, request))
+
+                updated.save()
+                messages.success(request, "Evento atualizado com sucesso!")
+                return redirect("event_details", id=updated.id)
+
+            except Exception as e:
+                messages.error(request, f"Erro ao atualizar evento: {str(e)}")
+        else:
+            messages.error(request, "Por favor, corrija os erros no formulário.")
+    else:
+        form = EventForm(instance=event)
+
+    context = {"form": form, "event": event}
+    template = loader.get_template("events/edit_event.html")
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url="landing_page")
+@teacher_only
+def cancel_event(request, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return HttpResponseNotFound()
+
+    if request.user != event.user:
+        messages.error(request, "Você não tem permissão para cancelar este evento.")
+        return redirect("event_details", id=id)
+
+    if request.method == "POST":
+        try:
+            if event.status == EventModel.Status.CANCELED:
+                messages.info(request, "Este evento já está cancelado.")
+                return redirect("event_details", id=id)
+
+            event.status = EventModel.Status.CANCELED
+            event.save()
+
+            messages.success(request, "Evento cancelado com sucesso!")
+            return redirect("event_details", id=id)
+
+        except Exception as e:
+            print(e)
+            messages.error(request, f"Erro ao cancelar evento: {str(e)}")
+            return redirect("event_details", id=id)
+
+    context = {"event": event}
+    template = loader.get_template("events/cancel_event.html")
+    return HttpResponse(template.render(context, request))
 
 
 def event_attendance_list(request, id):
