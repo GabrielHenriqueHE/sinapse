@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.utils import timezone
@@ -230,15 +230,9 @@ def cancel_event(request, id):
             return redirect("event_details", id=id)
 
         except Exception as e:
-            print(e)
             messages.error(request, f"Erro ao cancelar evento: {str(e)}")
             return redirect("event_details", id=id)
 
     context = {"event": event}
     template = loader.get_template("events/cancel_event.html")
     return HttpResponse(template.render(context, request))
-
-
-def event_attendance_list(request, id):
-    template = loader.get_template("events/event_attendance_list.html")
-    return HttpResponse(template.render(None, request))

@@ -184,6 +184,7 @@ class EventParticipantModel(BaseModel):
     class ParticipationStatus(models.TextChoices):
         PRESENT = "PRESENT", _("Presente")
         ABSENT = "ABSENT", _("Ausente")
+        PENDING = "PENDING", _("Pendente")
 
     user = models.ForeignKey(
         UserModel,
@@ -203,6 +204,7 @@ class EventParticipantModel(BaseModel):
         max_length=20,
         choices=ParticipationStatus.choices,
         null=True,
+        default=ParticipationStatus.PENDING,
         verbose_name=_("Status da participação"),
     )
 
@@ -220,13 +222,16 @@ class EventParticipantModel(BaseModel):
 
     def clean(self):
         if self.event and self.user:
-
             if self.event.user == self.user:
                 raise ValidationError(
                     _("O criador do evento não pode se inscrever como participante")
                 )
 
     def save(self, *args, **kwargs):
-        self.full_clean()
+        if self.status == self.ParticipationStatus.PRESENT and not self.attended_at:
+            self.attended_at = timezone.now()
+        elif self.status != self.ParticipationStatus.PRESENT:
+            self.attended_at = None
 
+        self.full_clean()
         super().save(*args, **kwargs)

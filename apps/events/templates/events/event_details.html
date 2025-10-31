@@ -40,7 +40,7 @@
                                 <div class="mt-6">
                                     <a href="{% url 'edit_event' event.id %}" 
                                        class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-orange-700 transition duration-300 shadow-lg font-medium inline-block">
-                                        Editar Evento
+                                        Editar evento
                                     </a>
                                 </div>
                             {% elif user.role == 'STUDENT' %}
@@ -52,7 +52,7 @@
                                         </button>
                                     {% else %}
                                         <button class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
-                                            Participar do Evento
+                                            Participar do evento
                                         </button>
                                     {% endif %}
                                 {% else %}
@@ -78,14 +78,14 @@
         <div class="lg:col-span-2 space-y-8">
             <!-- Sobre o Evento -->
             <div class="bg-white rounded-2xl shadow-lg p-8">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6">Sobre o Evento</h2>
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Sobre o evento</h2>
                 <div class="prose max-w-none">
                     <p class="text-gray-700 leading-relaxed mb-4">
                         {{ event.description|default:"Este é um evento incrível que reúne pessoas com interesses em comum. O organizador ainda não adicionou uma descrição detalhada, mas promete ser uma experiência única e enriquecedora para todos os participantes." }}
                     </p>
                     
                     {% if event.topics %}
-                    <h3 class="text-xl font-bold text-gray-900 mt-6 mb-4">Tópicos Abordados:</h3>
+                    <h3 class="text-xl font-bold text-gray-900 mt-6 mb-4">Tópicos abordados:</h3>
                     <div class="flex flex-wrap gap-2">
                         {% for topic in event.topics %}
                             <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">{{ topic }}</span>
@@ -106,7 +106,6 @@
                         <h3 class="text-xl font-bold text-gray-900">{{ event.user.first_name }} {{ event.user.last_name }}</h3>
                         <p class="text-gray-600">Organizador na plataforma Sinapse</p>
                         <div class="flex space-x-4 mt-2">
-                            <span class="text-sm text-gray-500">⭐ 4.8 (24 avaliações)</span>
                             <span class="text-sm text-gray-500">📅 {{ event.user.created_events.count }} eventos</span>
                         </div>
                     </div>
@@ -115,7 +114,7 @@
                 <!-- Apenas para o criador do evento -->
                 {% if user.is_authenticated and user.role == 'TEACHER' and event.user == user %}
                 <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 class="font-bold text-blue-900 mb-2">Painel do Organizador</h4>
+                    <h4 class="font-bold text-blue-900 mb-2">Painel do organizador</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="text-center">
                             <div class="text-2xl font-bold text-blue-600">{{ event.participants.count }}</div>
@@ -129,11 +128,11 @@
                                     ∞
                                 {% endif %}
                             </div>
-                            <div class="text-sm text-green-800">Vagas Restantes</div>
+                            <div class="text-sm text-green-800">Vagas restantes</div>
                         </div>
                         <div class="text-center">
                             <div class="text-2xl font-bold text-purple-600">75%</div>
-                            <div class="text-sm text-purple-800">Taxa de Ocupação</div>
+                            <div class="text-sm text-purple-800">Taxa de ocupação</div>
                         </div>
                     </div>
                 </div>
@@ -145,7 +144,7 @@
         <div class="space-y-8">
             <!-- Informações Principais -->
             <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-6">Informações do Evento</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Informações do evento</h3>
                 
                 <div class="space-y-4">
                     <!-- Data -->
@@ -154,7 +153,7 @@
                             <span class="text-gray-600">📅</span>
                         </div>
                         <div>
-                            <p class="text-sm text-gray-600">Data do Evento</p>
+                            <p class="text-sm text-gray-600">Data do evento</p>
                             <p class="font-bold text-gray-900">{{ event.start_date|date:"d F Y" }}</p>
                             <p class="text-sm text-gray-500">{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</p>
                         </div>
@@ -217,7 +216,7 @@
 
             <!-- Status do Evento -->
             <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-4">Status do Evento</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Status do evento</h3>
                 
                 <div class="space-y-3">
                     <!-- Status Atual -->
@@ -258,9 +257,10 @@
                     {% if user.is_authenticated %}
                         {% if user.role == 'TEACHER' and event.user == user %}
                             <!-- Ações para Professor (criador) -->
-                            <a href="/" class="w-full bg-gradient-to-br from-blue-500 to-purple-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition duration-300 text-center block font-medium">
+                            <a href="{% url 'edit_event' event.id %}" class="w-full bg-gradient-to-br from-blue-500 to-purple-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition duration-300 text-center block font-medium">
                                 Editar Evento
                             </a>
+                            {% if event.status != "CANCELED" %}
                             <button class="w-full bg-gradient-to-br from-green-500 to-teal-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 font-medium">
                                 Gerenciar Inscritos
                             </button>
@@ -269,40 +269,43 @@
                                     Cancelar Evento
                                 </button>
                             </a>
+                            {% endif %}
                         {% elif user.role == 'STUDENT' %}
                             <!-- Ações para Aluno -->
                             {% if event.status == 'OPEN' and not event.is_full %}
                                 {% if user in event.participants.all %}
                                     <button class="w-full bg-green-500 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
-                                        ✅ Inscrição Confirmada
+                                        ✅ Inscrição confirmada
                                     </button>
                                     <button class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 font-medium">
-                                        Cancelar Inscrição
+                                        Cancelar inscrição
                                     </button>
                                 {% else %}
-                                    <button class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 font-medium">
-                                        Confirmar Inscrição
-                                    </button>
+                                    <a href="{% url 'enroll_event' event.id %}">
+                                        <button class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 font-medium">
+                                            Participar do evento
+                                        </button>
+                                    </a>
                                 {% endif %}
                             {% else %}
                                 <button class="w-full bg-gray-400 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
-                                    Inscrições Indisponíveis
+                                    Inscrições indisponíveis
                                 </button>
                             {% endif %}
                         {% endif %}
                     {% else %}
                         <!-- Ações para Não Autenticado -->
                         <a href="{% url 'login' %}?next={{ request.path }}" class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 text-center block font-medium">
-                            Fazer Login
+                            Fazer login
                         </a>
                         <a href="{% url 'register' %}?next={{ request.path }}" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 text-center block font-medium">
-                            Criar Conta
+                            Criar conta
                         </a>
                     {% endif %}
                     
                     <!-- Ação Universal -->
                     <button class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 font-medium">
-                        Compartilhar Evento
+                        Compartilhar evento
                     </button>
                 </div>
             </div>

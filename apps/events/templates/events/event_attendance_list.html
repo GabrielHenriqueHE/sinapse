@@ -1,520 +1,417 @@
+<!-- templates/events/event_attendance.html -->
+{% extends 'partials/base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
-    {% include 'partials/_head.html' %}
-    <title>Lista de Presença - Tech Conference 2024 - Sinapse</title>
-    
-<body class="bg-gray-50 min-h-screen">
-    <!-- Header -->
-    {% include 'partials/_header.html' %}
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Cabeçalho e Estatísticas -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                    <div class="flex items-center space-x-4 mb-4">
-                        <a href="#" class="font-mono text-gray-500 hover:text-gray-700 transition duration-300">
-                            ← Voltar para o evento
-                        </a>
-                        <span class="font-mono bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
-                            ORGANIZADOR
-                        </span>
-                    </div>
-                    <h1 class="font-mono text-3xl font-bold text-gray-900 mb-2">Tech Conference 2024</h1>
-                    <p class="font-mono text-gray-600">Gerenciar lista de presença</p>
+{% block title %}Lista de Chamada - {{ event.name }} - Sinapse{% endblock %}
+
+{% block content %}
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Cabeçalho e Estatísticas -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+                <div class="flex items-center space-x-4 mb-4">
+                    <a href="{% url 'event_details' event.id %}" class="text-gray-500 hover:text-gray-700 transition duration-300 flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Voltar para o evento
+                    </a>
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        ORGANIZADOR
+                    </span>
                 </div>
-                
-                <!-- Estatísticas -->
-                <div class="flex space-x-6 mt-4 lg:mt-0">
-                    <div class="text-center">
-                        <div class="font-mono text-2xl font-bold text-gray-900">45</div>
-                        <div class="font-mono text-sm text-gray-600">Presentes</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="font-mono text-2xl font-bold text-gray-900">12</div>
-                        <div class="font-mono text-sm text-gray-600">Faltantes</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="font-mono text-2xl font-bold text-gray-900">57</div>
-                        <div class="font-mono text-sm text-gray-600">Total</div>
-                    </div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ event.name }}</h1>
+                <p class="text-gray-600">Gerencie a lista de presença e confirme participação para emissão de certificados</p>
+            </div>
+            
+            <!-- Estatísticas -->
+            <div class="flex space-x-8 mt-4 lg:mt-0">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-600">{{ present_count }}</div>
+                    <div class="text-sm text-gray-600">Presentes</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-red-600">{{ absent_count }}</div>
+                    <div class="text-sm text-gray-600">Faltantes</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gray-600">{{ pending_count }}</div>
+                    <div class="text-sm text-gray-600">Pendentes</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gray-900">{{ total_count }}</div>
+                    <div class="text-sm text-gray-600">Total</div>
                 </div>
             </div>
         </div>
+        
+        <!-- Barra de Progresso -->
+        <div class="mt-6">
+            <div class="flex justify-between mb-2">
+                <span class="text-sm font-medium text-gray-700">Taxa de Presença</span>
+                <span class="text-sm font-bold text-gray-900">{{ attendance_rate|floatformat:1 }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-gradient-to-r from-green-500 to-teal-500 h-3 rounded-full transition-all duration-500" 
+                     style="width: {{ attendance_rate }}%"></div>
+            </div>
+        </div>
+    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Lista de Participantes -->
-            <div class="lg:col-span-3">
-                <div class="bg-white rounded-2xl shadow-lg">
-                    <!-- Header da Lista -->
-                    <div class="p-6 border-b border-gray-200">
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                            <h2 class="font-mono text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Lista de Participantes</h2>
-                            <div class="flex space-x-3">
-                                <!-- Busca -->
-                                <div class="relative">
-                                    <input type="text" 
-                                           placeholder="Buscar participante..."
-                                           class="font-mono pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300 w-64">
-                                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                        <span class="text-gray-400">🔍</span>
-                                    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- Lista de Participantes -->
+        <div class="lg:col-span-3">
+            <div class="bg-white rounded-2xl shadow-lg">
+                <!-- Header da Lista -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">Lista de Chamada</h2>
+                        <div class="flex space-x-3">
+                            <!-- Busca -->
+                            <div class="relative">
+                                <input type="text" 
+                                       id="searchInput"
+                                       placeholder="Buscar participante..."
+                                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition duration-300 w-64">
+                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
+                                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
                                 </div>
-                                <!-- Filtro -->
-                                <select class="font-mono px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300">
-                                    <option value="all">Todos</option>
-                                    <option value="present">Presentes</option>
-                                    <option value="absent">Faltantes</option>
-                                </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Tabela de Participantes -->
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead>
-                                <tr class="border-b border-gray-200">
-                                    <th class="font-mono text-left py-4 px-6 text-sm font-medium text-gray-700">Participante</th>
-                                    <th class="font-mono text-left py-4 px-6 text-sm font-medium text-gray-700">Email</th>
-                                    <th class="font-mono text-left py-4 px-6 text-sm font-medium text-gray-700">Data de Inscrição</th>
-                                    <th class="font-mono text-center py-4 px-6 text-sm font-medium text-gray-700">Status</th>
-                                    <th class="font-mono text-center py-4 px-6 text-sm font-medium text-gray-700">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <!-- Participante 1 - Presente -->
-                                <tr class="hover:bg-gray-50 transition duration-300">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full"></div>
-                                            <div>
-                                                <div class="font-mono font-medium text-gray-900">João Silva</div>
-                                                <div class="font-mono text-sm text-gray-500">CPF: 123.456.789-00</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">joao.silva@email.com</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">15/10/2024</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center">
-                                            <span class="font-mono bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                ✅ Presente
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center space-x-2">
-                                            <button class="font-mono bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm">
-                                                Marcar Falta
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Participante 2 - Presente -->
-                                <tr class="hover:bg-gray-50 transition duration-300">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full"></div>
-                                            <div>
-                                                <div class="font-mono font-medium text-gray-900">Maria Santos</div>
-                                                <div class="font-mono text-sm text-gray-500">CPF: 987.654.321-00</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">maria.santos@email.com</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">12/10/2024</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center">
-                                            <span class="font-mono bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                ✅ Presente
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center space-x-2">
-                                            <button class="font-mono bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm">
-                                                Marcar Falta
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Participante 3 - Faltante -->
-                                <tr class="hover:bg-gray-50 transition duration-300 bg-red-50">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-red-600 rounded-full"></div>
-                                            <div>
-                                                <div class="font-mono font-medium text-gray-900">Pedro Oliveira</div>
-                                                <div class="font-mono text-sm text-gray-500">CPF: 456.789.123-00</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">pedro.oliveira@email.com</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">18/10/2024</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center">
-                                            <span class="font-mono bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                ❌ Faltante
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center space-x-2">
-                                            <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
-                                                Marcar Presença
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Participante 4 - Faltante -->
-                                <tr class="hover:bg-gray-50 transition duration-300">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full"></div>
-                                            <div>
-                                                <div class="font-mono font-medium text-gray-900">Ana Costa</div>
-                                                <div class="font-mono text-sm text-gray-500">CPF: 789.123.456-00</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">ana.costa@email.com</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">20/10/2024</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center">
-                                            <span class="font-mono bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                ⏳ Pendente
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center space-x-2">
-                                            <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
-                                                Marcar Presença
-                                            </button>
-                                            <button class="font-mono bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm">
-                                                Marcar Falta
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Participante 5 - Pendente -->
-                                <tr class="hover:bg-gray-50 transition duration-300">
-                                    <td class="py-4 px-6">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-full"></div>
-                                            <div>
-                                                <div class="font-mono font-medium text-gray-900">Carlos Lima</div>
-                                                <div class="font-mono text-sm text-gray-500">CPF: 321.654.987-00</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">carlos.lima@email.com</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="font-mono text-gray-900">22/10/2024</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center">
-                                            <span class="font-mono bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
-                                                ⏳ Pendente
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <div class="flex justify-center space-x-2">
-                                            <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
-                                                Marcar Presença
-                                            </button>
-                                            <button class="font-mono bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm">
-                                                Marcar Falta
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Paginação -->
-                    <div class="p-6 border-t border-gray-200">
-                        <div class="flex items-center justify-between">
-                            <div class="font-mono text-sm text-gray-700">
-                                Mostrando 1-5 de 57 participantes
-                            </div>
-                            <div class="flex space-x-2">
-                                <button class="font-mono px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300">
-                                    Anterior
-                                </button>
-                                <button class="font-mono px-3 py-1 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-300">
-                                    1
-                                </button>
-                                <button class="font-mono px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300">
-                                    2
-                                </button>
-                                <button class="font-mono px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300">
-                                    Próximo
-                                </button>
-                            </div>
+                            <!-- Filtro -->
+                            <select id="statusFilter" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition duration-300">
+                                <option value="all">Todos os status</option>
+                                <option value="present">Presentes</option>
+                                <option value="absent">Faltantes</option>
+                                <option value="pending">Pendentes</option>
+                            </select>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Sidebar de Ações -->
-            <div class="space-y-6">
-                <!-- Adicionar Participantes -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Adicionar Participantes</h3>
-                    <div class="space-y-4">
-                        <!-- Busca de Participantes -->
-                        <div>
-                            <label class="font-mono text-sm font-medium text-gray-700 block mb-2">
-                                Buscar por nome ou email
-                            </label>
-                            <div class="relative">
-                                <input type="text" 
-                                       id="searchParticipant"
-                                       placeholder="Digite nome ou email..."
-                                       class="font-mono w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300">
-                                <div class="absolute left-3 top-1/2 transform -translate-y-1/2">
-                                    <span class="text-gray-400">🔍</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Resultados da Busca -->
-                        <div id="searchResults" class="space-y-2 max-h-60 overflow-y-auto hidden">
-                            <!-- Resultado 1 -->
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300 cursor-pointer participant-result">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <div class="font-mono font-medium text-gray-900">Lucas Mendes</div>
-                                        <div class="font-mono text-sm text-gray-500">lucas.mendes@email.com</div>
+                <!-- Tabela de Participantes -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-gray-200 bg-gray-50">
+                                <th class="text-left py-4 px-6 text-sm font-medium text-gray-700">Participante</th>
+                                <th class="text-left py-4 px-6 text-sm font-medium text-gray-700">Email</th>
+                                <th class="text-left py-4 px-6 text-sm font-medium text-gray-700">Data de Inscrição</th>
+                                <th class="text-center py-4 px-6 text-sm font-medium text-gray-700">Status</th>
+                                <th class="text-center py-4 px-6 text-sm font-medium text-gray-700">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200" id="participantsTable">
+                            {% for record in participants_records %}
+                            <tr class="hover:bg-gray-50 transition duration-300 attendance-row 
+                                {% if record.status == 'ABSENT' %}bg-red-50{% endif %}"
+                                data-status="{% if record.status == 'PRESENT' %}present{% elif record.status == 'ABSENT' %}absent{% else %}pending{% endif %}"
+                                data-name="{{ record.user.get_full_name|lower }}"
+                                data-email="{{ record.user.email|lower }}">
+                                <td class="py-4 px-6">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                            {{ record.user.first_name|first }}{{ record.user.last_name|first }}
+                                        </div>
+                                        <div>
+                                            <div class="font-medium text-gray-900">{{ record.user.get_full_name }}</div>
+                                            <div class="text-sm text-gray-500">
+                                                {% if record.user.cpf %}
+                                                    CPF: {{ record.user.cpf }}
+                                                {% else %}
+                                                    CPF não informado
+                                                {% endif %}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm add-participant">
-                                        Adicionar
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Resultado 2 -->
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300 cursor-pointer participant-result">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <div class="font-mono font-medium text-gray-900">Fernanda Rocha</div>
-                                        <div class="font-mono text-sm text-gray-500">fernanda.rocha@email.com</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="text-gray-900">{{ record.user.email }}</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="text-gray-900">{{ record.created_at|date:"d/m/Y" }}</div>
+                                    <div class="text-sm text-gray-500">{{ record.created_at|date:"H:i" }}</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="flex justify-center">
+                                        <span class="{% if record.status == 'PRESENT' %}bg-green-100 text-green-800{% elif record.status == 'ABSENT' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %} px-3 py-1 rounded-full text-sm font-medium">
+                                            {% if record.status == 'PRESENT' %}
+                                                ✅ Presente
+                                            {% elif record.status == 'ABSENT' %}
+                                                ❌ Faltante
+                                            {% else %}
+                                                ⏳ Pendente
+                                            {% endif %}
+                                        </span>
                                     </div>
-                                    <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm add-participant">
-                                        Adicionar
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Resultado 3 -->
-                            <div class="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition duration-300 cursor-pointer participant-result">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <div class="font-mono font-medium text-gray-900">Ricardo Almeida</div>
-                                        <div class="font-mono text-sm text-gray-500">ricardo.almeida@email.com</div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    <div class="flex justify-center space-x-2">
+                                        <form method="POST" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="participant_id" value="{{ record.id }}">
+                                            
+                                            {% if record.status != 'PRESENT' %}
+                                            <button type="submit" 
+                                                    name="status" 
+                                                    value="PRESENT"
+                                                    class="bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm font-medium">
+                                                Marcar Presença
+                                            </button>
+                                            {% endif %}
+                                            
+                                            {% if record.status != 'ABSENT' %}
+                                            <button type="submit" 
+                                                    name="status" 
+                                                    value="ABSENT"
+                                                    class="bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm font-medium">
+                                                Marcar Falta
+                                            </button>
+                                            {% endif %}
+                                        </form>
                                     </div>
-                                    <button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm add-participant">
-                                        Adicionar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <svg class="w-16 h-16 mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                                        </svg>
+                                        <p class="text-lg font-medium mb-2">Nenhum participante inscrito</p>
+                                        <p class="text-sm">Os participantes aparecerão aqui quando se inscreverem no evento.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
 
-                        <!-- Mensagem quando não há resultados -->
-                        <div id="noResults" class="hidden">
-                            <div class="text-center p-4 border border-gray-200 rounded-lg">
-                                <span class="font-mono text-gray-500">Nenhum participante encontrado</span>
-                            </div>
+                <!-- Paginação -->
+                {% if participants_records %}
+                <div class="p-6 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-700">
+                            Mostrando <span id="showingCount">{{ total_count }}</span> de {{ total_count }} participantes
                         </div>
-
-                        <!-- Botão de Adicionar Manualmente -->
-                        <div class="pt-4 border-t border-gray-200">
-                            <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
-                                <span>👤</span>
-                                <span>Adicionar Manualmente</span>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 text-sm">
+                                Anterior
+                            </button>
+                            <button class="px-3 py-1 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition duration-300 text-sm">
+                                1
+                            </button>
+                            <button class="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-300 text-sm">
+                                Próximo
                             </button>
                         </div>
                     </div>
                 </div>
+                {% endif %}
+            </div>
+        </div>
 
-                <!-- Estatísticas em Tempo Real -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Estatísticas</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="font-mono text-sm text-gray-600">Taxa de Presença</span>
-                                <span class="font-mono text-sm font-bold text-gray-900">79%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-600 h-2 rounded-full" style="width: 79%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="font-mono text-sm text-gray-600">Check-ins Hoje</span>
-                                <span class="font-mono text-sm font-bold text-gray-900">23</span>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between mb-1">
-                                <span class="font-mono text-sm text-gray-600">Última Atualização</span>
-                                <span class="font-mono text-sm font-bold text-gray-900">15:30</span>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Sidebar de Ações -->
+        <div class="space-y-6">
+            <!-- Ações Rápidas -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Ações Rápidas</h3>
+                <div class="space-y-3">
+                    <button id="markAllPresent" class="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition duration-300 font-medium flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Marcar Todos Presentes</span>
+                    </button>
+                    
+                    <button id="exportList" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Exportar Lista</span>
+                    </button>
+                    
+                    <button class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Enviar Lembrete</span>
+                    </button>
+                    
+                    <a href="{% url 'event_details' event.id %}" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Ver Detalhes do Evento</span>
+                    </a>
                 </div>
+            </div>
 
-                <!-- Ações Rápidas -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Ações Rápidas</h3>
-                    <div class="space-y-3">
-                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
-                            <span>📋</span>
-                            <span>Exportar Lista</span>
-                        </button>
-                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 flex items-center justify-center space-x-2">
-                            <span>📧</span>
-                            <span>Enviar Lembrete</span>
-                        </button>
+            <!-- Informações do Evento -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Informações do Evento</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Data:</span>
+                        <span class="text-sm font-medium text-gray-900">{{ event.start_date|date:"d/m/Y" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Horário:</span>
+                        <span class="text-sm font-medium text-gray-900">{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Local:</span>
+                        <span class="text-sm font-medium text-gray-900">{{ event.city }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Status:</span>
+                        <span class="text-sm font-medium {% if event.status == 'OPEN' %}text-green-600{% elif event.status == 'CLOSED' %}text-yellow-600{% else %}text-gray-600{% endif %}">
+                            {{ event.get_status_display }}
+                        </span>
                     </div>
                 </div>
             </div>
+
+            <!-- Certificados -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Certificados</h3>
+                <div class="space-y-3">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>{{ present_count }} participantes</strong> marcados como presentes podem receber certificados.
+                        </p>
+                    </div>
+                    <button class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 font-medium">
+                        Gerar Certificados
+                    </button>
+                    <button class="w-full border border-purple-300 text-purple-600 py-3 rounded-lg hover:bg-purple-50 transition duration-300 font-medium">
+                        Configurar Modelo
+                    </button>
+                </div>
+            </div>
         </div>
-    </main>
+    </div>
+</main>
 
-    <script>
-        // Simulação de marcação de presença/falta
-        document.addEventListener('DOMContentLoaded', function() {
-            const actionButtons = document.querySelectorAll('button[class*="bg-green-100"], button[class*="bg-red-100"]');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const participantsTable = document.getElementById('participantsTable');
+        const showingCount = document.getElementById('showingCount');
+        const markAllPresentBtn = document.getElementById('markAllPresent');
+        const exportListBtn = document.getElementById('exportList');
+        
+        let visibleRows = document.querySelectorAll('.attendance-row');
+        
+        // Função para filtrar a tabela
+        function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusFilterValue = statusFilter.value;
             
-            actionButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const row = this.closest('tr');
-                    const statusCell = row.querySelector('td:nth-child(4)');
-                    const actionsCell = row.querySelector('td:nth-child(5)');
-                    
-                    if (this.textContent.includes('Marcar Presença')) {
-                        // Marcar como presente
-                        statusCell.innerHTML = '<div class="flex justify-center"><span class="font-mono bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">✅ Presente</span></div>';
-                        actionsCell.innerHTML = '<div class="flex justify-center space-x-2"><button class="font-mono bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition duration-300 text-sm">Marcar Falta</button></div>';
-                        row.classList.remove('bg-red-50');
-                    } else if (this.textContent.includes('Marcar Falta')) {
-                        // Marcar como faltante
-                        statusCell.innerHTML = '<div class="flex justify-center"><span class="font-mono bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">❌ Faltante</span></div>';
-                        actionsCell.innerHTML = '<div class="flex justify-center space-x-2"><button class="font-mono bg-green-100 text-green-700 px-3 py-1 rounded-lg hover:bg-green-200 transition duration-300 text-sm">Marcar Presença</button></div>';
-                        row.classList.add('bg-red-50');
-                    }
-                    
-                    // Atualizar estatísticas (simulação)
-                    updateStatistics();
-                });
-            });
-
-            function updateStatistics() {
-                // Simulação de atualização de estatísticas
-                console.log('Estatísticas atualizadas');
-            }
-
-            // Busca na lista principal
-            const searchInput = document.querySelector('input[placeholder="Buscar participante..."]');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const rows = document.querySelectorAll('tbody tr');
+            let visibleCount = 0;
+            
+            visibleRows.forEach(row => {
+                const name = row.getAttribute('data-name');
+                const email = row.getAttribute('data-email');
+                const status = row.getAttribute('data-status');
                 
-                rows.forEach(row => {
-                    const participantName = row.querySelector('td:first-child .font-medium').textContent.toLowerCase();
-                    if (participantName.includes(searchTerm)) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            });
-
-            // Busca para adicionar participantes
-            const searchParticipantInput = document.getElementById('searchParticipant');
-            const searchResults = document.getElementById('searchResults');
-            const noResults = document.getElementById('noResults');
-
-            searchParticipantInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
+                const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
+                const matchesStatus = statusFilterValue === 'all' || status === statusFilterValue;
                 
-                if (searchTerm.length > 2) {
-                    // Simulação de busca - mostrar resultados
-                    searchResults.classList.remove('hidden');
-                    noResults.classList.add('hidden');
-                    
-                    // Filtrar resultados (simulação)
-                    const results = document.querySelectorAll('.participant-result');
-                    let hasVisibleResults = false;
-                    
-                    results.forEach(result => {
-                        const name = result.querySelector('.font-medium').textContent.toLowerCase();
-                        const email = result.querySelector('.text-sm').textContent.toLowerCase();
-                        
-                        if (name.includes(searchTerm) || email.includes(searchTerm)) {
-                            result.style.display = '';
-                            hasVisibleResults = true;
-                        } else {
-                            result.style.display = 'none';
-                        }
-                    });
-                    
-                    if (!hasVisibleResults) {
-                        searchResults.classList.add('hidden');
-                        noResults.classList.remove('hidden');
-                    }
+                if (matchesSearch && matchesStatus) {
+                    row.style.display = '';
+                    visibleCount++;
                 } else {
-                    searchResults.classList.add('hidden');
-                    noResults.classList.add('hidden');
+                    row.style.display = 'none';
                 }
             });
-
-            // Adicionar participante
-            const addButtons = document.querySelectorAll('.add-participant');
-            addButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const resultItem = this.closest('.participant-result');
-                    const name = resultItem.querySelector('.font-medium').textContent;
-                    const email = resultItem.querySelector('.text-sm').textContent;
-                    
-                    // Simulação de adição à lista
-                    alert(`Participante "${name}" (${email}) adicionado com sucesso!`);
-                    
-                    // Limpar busca
-                    searchParticipantInput.value = '';
-                    searchResults.classList.add('hidden');
+            
+            showingCount.textContent = visibleCount;
+        }
+        
+        // Event listeners para busca e filtro
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+        
+        // Marcar todos como presentes
+        markAllPresentBtn.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja marcar TODOS os participantes como presentes?')) {
+                // Encontrar todos os botões "Marcar Presença" que estão visíveis e clicá-los
+                const presentButtons = document.querySelectorAll('button[value="PRESENT"]');
+                let markedCount = 0;
+                
+                presentButtons.forEach(button => {
+                    if (button.closest('tr').style.display !== 'none') {
+                        button.click();
+                        markedCount++;
+                    }
                 });
+                
+                if (markedCount > 0) {
+                    // Recarregar a página após um breve delay para mostrar a mensagem de sucesso
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                }
+            }
+        });
+        
+        // Exportar lista
+        exportListBtn.addEventListener('click', function() {
+            // Simular exportação
+            const eventName = '{{ event.name }}';
+            const date = '{{ event.start_date|date:"d-m-Y" }}';
+            const filename = `lista-chamada-${eventName.replace(/\s+/g, '-').toLowerCase()}-${date}.csv`;
+            
+            // Criar conteúdo CSV
+            let csvContent = "Nome,Email,CPF,Data Inscrição,Status\n";
+            
+            visibleRows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    const name = row.querySelector('.font-medium').textContent;
+                    const email = row.querySelector('td:nth-child(2) div').textContent;
+                    const cpf = row.querySelector('.text-sm.text-gray-500').textContent.replace('CPF: ', '');
+                    const inscricao = row.querySelector('td:nth-child(3) div').textContent;
+                    const status = row.querySelector('td:nth-child(4) span').textContent.trim();
+                    
+                    csvContent += `"${name}","${email}","${cpf}","${inscricao}","${status}"\n`;
+                }
+            });
+            
+            // Criar e baixar arquivo
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Inicializar contador
+        filterTable();
+        
+        // Adicionar confirmação para ações de marcação
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const button = e.submitter;
+                const participantName = this.closest('tr').querySelector('.font-medium').textContent;
+                const action = button.value === 'PRESENT' ? 'marcar como PRESENTE' : 'marcar como FALTANTE';
+                
+                if (!confirm(`Tem certeza que deseja ${action} o participante "${participantName}"?`)) {
+                    e.preventDefault();
+                }
             });
         });
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}

@@ -184,9 +184,11 @@
                 </span>
                 
                 <!-- Botão Ver Detalhes -->
-                <button class="bg-gradient-to-br from-green-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 transition duration-300">
-                  Ver Detalhes
-                </button>
+                <a href="{% url 'event_details' event.id %}">
+                  <button class="bg-gradient-to-br from-green-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 transition duration-300">
+                    Ver detalhes
+                  </button>
+                </a>
               </div>
             </div>
           </div>
@@ -461,9 +463,11 @@
                 <!-- Botão Participar (apenas para alunos) -->
                 {% if user.role == 'STUDENT' %}
                   {% if event.status == 'OPEN' and not event.is_full %}
-                  <button class="bg-gradient-to-br from-blue-500 to-cyan-500 text-white px-4 py-2 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition duration-300">
-                    Participar
-                  </button>
+                  <a href="{% url 'event_details' event.id %}">
+                    <button class="bg-gradient-to-br from-green-500 to-teal-500 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-teal-600 transition duration-300">
+                      Participar
+                    </button>
+                  </a>
                   {% else %}
                   <button class="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed" disabled>
                     Indisponível
