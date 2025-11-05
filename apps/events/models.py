@@ -184,7 +184,7 @@ class EventParticipantModel(BaseModel):
     class ParticipationStatus(models.TextChoices):
         PRESENT = "PRESENT", _("Presente")
         ABSENT = "ABSENT", _("Ausente")
-        PENDING = "PENDING", _("Pendente")
+        PENDING = "PENDING", _("Pendente")  # Novo status
 
     user = models.ForeignKey(
         UserModel,
@@ -203,8 +203,7 @@ class EventParticipantModel(BaseModel):
     status = models.CharField(
         max_length=20,
         choices=ParticipationStatus.choices,
-        null=True,
-        default=ParticipationStatus.PENDING,
+        default=ParticipationStatus.PENDING,  # Valor padrão
         verbose_name=_("Status da participação"),
     )
 

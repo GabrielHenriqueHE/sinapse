@@ -264,7 +264,15 @@
                             <button class="w-full bg-gradient-to-br from-green-500 to-teal-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 font-medium">
                                 Gerenciar Inscritos
                             </button>
-                            <a href="{% url 'cancel_event' event.id %}">
+                            {% if user.is_authenticated and user.role == 'TEACHER' and event.user == user %}
+                                <a href="{% url 'event_attendance' event.id %}" class="flex items-center"
+                                >
+                                <button class="w-full border border-blue-300 text-white py-3 rounded-lg bg-blue-500 transition duration-300 font-medium">
+                                    📋 Lista de Chamada
+                                </button>
+                                </a>
+                            {% endif %}
+                            <a href="{% url 'cancel_event' event.id %}" class="flex items-center">
                                 <button class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 font-medium">
                                     Cancelar Evento
                                 </button>
@@ -277,9 +285,11 @@
                                     <button class="w-full bg-green-500 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
                                         ✅ Inscrição confirmada
                                     </button>
-                                    <button class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 font-medium">
-                                        Cancelar inscrição
-                                    </button>
+                                    <a href="{% url 'cancel_enrollment' event.id %}">
+                                        <button class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 font-medium">
+                                            Cancelar inscrição
+                                        </button>
+                                    </a>
                                 {% else %}
                                     <a href="{% url 'enroll_event' event.id %}">
                                         <button class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 font-medium">

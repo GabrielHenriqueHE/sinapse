@@ -1,7 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import (
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+)
 from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.utils import timezone
@@ -10,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from apps.authentication.decorators import student_only, teacher_only
 from apps.authentication.models import UserModel
 from apps.events.forms import EventForm
-from apps.events.models import EventModel
+from apps.events.models import EventModel, EventParticipantModel
 
 
 def events(request: HttpRequest):
@@ -235,4 +240,50 @@ def cancel_event(request, id):
 
     context = {"event": event}
     template = loader.get_template("events/cancel_event.html")
+    return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url="landing_page")
+@teacher_only
+def event_attendance(request: HttpRequest, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return HttpResponseNotFound("Não foi possível localizar o evento")
+
+    if request.user != event.user:
+        return redirect("event_details", id=id)
+
+    if request.method == "POST":
+        participant_id = request.POST.get("participant_id")
+        status = request.POST.get("status")
+
+        if participant_id and status in ["PRESENT", "ABSENT"]:
+            try:
+                record = event.participants_records.get(id=participant_id)
+                record.status = status
+                record.save()
+                messages.success(
+                    request, f"Status de {record.user.get_full_name()} atualizado."
+                )
+            except:
+                messages.error(request, "Erro ao atualizar.")
+
+        return redirect("event_attendance", id=id)
+
+    # Busca participantes
+    participants = event.participants_records.all().select_related("user")
+
+    # Calcula estatísticas
+    present_count = participants.filter(status="PRESENT").count()
+    total_count = participants.count()
+
+    context = {
+        "event": event,
+        "participants": participants,
+        "present_count": present_count,
+        "total_count": total_count,
+    }
+
+    template = loader.get_template("events/event_attendance_list.html")
     return HttpResponse(template.render(context, request))
