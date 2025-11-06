@@ -19,6 +19,8 @@ from apps.events.models import EventModel, EventParticipantModel
 
 
 def events(request: HttpRequest):
+    EventModel.objects.filter(start_date__lte=timezone.now()).update(status=EventModel.Status.CLOSED)
+
     user = request.user if request.user.is_authenticated else None
 
     new = EventModel.objects.filter(start_date__gte=timezone.now()).order_by(
@@ -253,6 +255,9 @@ def event_attendance(request: HttpRequest, id):
 
     if request.user != event.user:
         return redirect("event_details", id=id)
+    
+    if event.end_date > timezone.now():
+        return redirect("event_details", id=id)
 
     if request.method == "POST":
         participant_id = request.POST.get("participant_id")
@@ -266,13 +271,13 @@ def event_attendance(request: HttpRequest, id):
                 messages.success(
                     request, f"Status de {record.user.get_full_name()} atualizado."
                 )
-            except:
+            except Exception as e:
                 messages.error(request, "Erro ao atualizar.")
 
         return redirect("event_attendance", id=id)
 
     # Busca participantes
-    participants = event.participants_records.all().select_related("user")
+    participants = event.participants_records.all()
 
     # Calcula estatísticas
     present_count = participants.filter(status="PRESENT").count()
@@ -286,4 +291,43 @@ def event_attendance(request: HttpRequest, id):
     }
 
     template = loader.get_template("events/event_attendance_list.html")
+    return HttpResponse(template.render(context, request))
+
+@login_required(login_url="landing_page")
+@teacher_only
+def finish_event(request: HttpRequest, id: int):
+    
+    event = get_object_or_404(EventModel, id=id)
+    
+    
+    if request.user != event.user:
+        messages.error(request, "Você não tem permissão para finalizar este evento.")
+        return redirect("event_details", id=id)
+    
+    
+    if event.end_date > timezone.now():
+        messages.error(request, "O evento ainda não terminou. Aguarde a data de término para finalizar.")
+        return redirect("event_attendance", id=id)
+    
+    
+    if event.status == EventModel.Status.FINISHED:
+        messages.info(request, "Este evento já está finalizado.")
+        return redirect("event_details", id=id)  
+    
+    if request.method == "POST":
+        try:
+            
+            event.status = EventModel.Status.FINISHED
+            event.save()
+            
+            messages.success(request, "Evento finalizado com sucesso! As edições foram bloqueadas.")
+            return redirect("event_details", id=id)  # ✅ Mudança: redirecionar para detalhes
+            
+        except Exception as e:
+            messages.error(request, f"Erro ao finalizar evento: {str(e)}")
+            return redirect("event_attendance", id=id)
+    
+    # GET request - mostrar confirmação
+    context = {"event": event}
+    template = loader.get_template("events/finish_event.html")
     return HttpResponse(template.render(context, request))

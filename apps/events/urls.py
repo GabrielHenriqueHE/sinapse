@@ -12,5 +12,6 @@ urlpatterns = [
     ),
     path("<uuid:id>/edit", views.edit_event, name="edit_event"),
     path("<uuid:id>/cancel", views.cancel_event, name="cancel_event"),
-    path("<uuid:id>/attendance", views.event_attendance, name="event_attendance")
+    path("<uuid:id>/attendance", views.event_attendance, name="event_attendance"),
+    path("<uuid:id>/finish", views.finish_event, name="finish_event")
 ]

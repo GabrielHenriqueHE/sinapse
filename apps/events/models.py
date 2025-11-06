@@ -177,6 +177,10 @@ class EventModel(BaseModel):
         if not self.participants_limit:
             return None
         return max(0, self.participants_limit - self.participants.count())
+    
+    @property
+    def attendance_available(self):
+        return self.end_date < timezone.now()
 
 
 class EventParticipantModel(BaseModel):
@@ -205,6 +209,12 @@ class EventParticipantModel(BaseModel):
         choices=ParticipationStatus.choices,
         default=ParticipationStatus.PENDING,  # Valor padrão
         verbose_name=_("Status da participação"),
+    )
+
+    attended_at = models.DateTimeField(  # Novo campo para registrar quando a presença foi confirmada
+        null=True, 
+        blank=True,
+        verbose_name=_("Data/hora da confirmação de presença")
     )
 
     created_at = models.DateTimeField(auto_now_add=True)
