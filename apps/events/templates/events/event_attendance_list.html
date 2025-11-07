@@ -42,16 +42,13 @@
                         Após finalizar, não será possível editar a lista de chamada ou o evento.
                     </p>
                 </div>
-                <form method="POST">
-                    {% csrf_token %}
-                    <a href="% url 'finish_event' event.id %">
-                        <button type="submit" name="finish_event"
-                                class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
-                                onclick="return confirm('Tem certeza que deseja finalizar este evento? Esta ação não pode ser desfeita.')">
-                            ✅ Finalizar evento
-                        </button>
-                    </a>
-                </form>
+                <a href="{% url 'finish_event' event.id %}">
+                    <button type="submit" name="finish_event"
+                            class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium"
+                            onclick="return confirm('Tem certeza que deseja finalizar este evento? Esta ação não pode ser desfeita.')">
+                        ✅ Finalizar evento
+                    </button>
+                </a>
             </div>
         </div>
         {% endif %}

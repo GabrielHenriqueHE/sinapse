@@ -288,15 +288,15 @@
                                 <!-- Ações para eventos finalizados ou cancelados -->
                                 <div class="w-full bg-gray-100 text-gray-600 py-3 rounded-lg text-center font-medium">
                                     {% if event.status == 'FINISHED' %}
-                                        ✅ Evento Finalizado
+                                        ✅ Evento finalizado
                                     {% else %}
-                                        ❌ Evento Cancelado
+                                        ❌ Evento cancelado
                                     {% endif %}
                                 </div>
                                 
                                 {% if event.status == 'FINISHED' %}
                                     <a href="{% url 'event_attendance' event.id %}" class="w-full border border-blue-300 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition duration-300 text-center block font-medium">
-                                        📋 Ver Lista de Chamada
+                                        📋 Ver lista de chamada
                                     </a>
                                 {% endif %}
                             {% endif %}
@@ -318,7 +318,7 @@
                                 {% endif %}
                             {% else %}
                                 <button class="w-full bg-gray-400 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
-                                    {% if event.status == 'FINISHED' %}Evento Finalizado{% elif event.status == 'CANCELED' %}Evento Cancelado{% elif event.is_full %}Evento Lotado{% else %}Inscrições Encerradas{% endif %}
+                                    {% if event.status == 'FINISHED' %}Evento Finalizado{% elif event.status == 'CANCELED' %}Evento Cancelado{% elif event.is_full %}Evento Lotado{% else %}Inscrições encerradas{% endif %}
                                 </button>
                             {% endif %}
                         {% endif %}

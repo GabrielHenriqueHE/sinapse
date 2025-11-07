@@ -180,7 +180,7 @@
               <div class="flex justify-between items-center">
                 <!-- Status da Participação -->
                 <span class="text-green-600 font-semibold">
-                  Confirmado
+                  {% if event.status == 'FINISHED' %}Finalizado{% else %}Confirmado{% endif %}
                 </span>
                 
                 <!-- Botão Ver Detalhes -->
