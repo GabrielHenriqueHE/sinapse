@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "apps.events",
     "apps.authentication",
+    "apps.certificates",
 ]
 
 AUTH_USER_MODEL = "authentication.UserModel"

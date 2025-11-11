@@ -20,11 +20,8 @@ from apps.events.models import EventModel, EventParticipantModel
 
 def events(request: HttpRequest):
     EventModel.objects.filter(
-        start_date__lte=timezone.now(),
-        status__in=[EventModel.Status.OPEN]
-    ).update(
-        status=EventModel.Status.CLOSED
-    )
+        start_date__lte=timezone.now(), status__in=[EventModel.Status.OPEN]
+    ).update(status=EventModel.Status.CLOSED)
 
     user = request.user if request.user.is_authenticated else None
 
