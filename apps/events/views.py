@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from weasyprint import HTML
 
 from apps.authentication.decorators import student_only, teacher_only
 from apps.authentication.models import UserModel
@@ -336,3 +337,84 @@ def finish_event(request: HttpRequest, id: int):
     context = {"event": event}
     template = loader.get_template("events/finish_event.html")
     return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url="landing_page")
+@student_only
+def generate_certificate(request, id):
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return HttpResponseNotFound("Não foi possível localizar o evento.")
+
+    participation = EventParticipantModel.objects.filter(
+        event=event, user=request.user
+    ).first()
+
+    if not participation:
+        messages.error(request=request, message=_("Você não participou deste evento."))
+        return redirect("event_details", id=id)
+
+    if participation.status != EventParticipantModel.ParticipationStatus.PRESENT:
+        messages.error(
+            request=request,
+            message=_(
+                "Você precisa ter comparecido ao evento para gerar o certificado."
+            ),
+        )
+        return redirect("event_details", id=id)
+
+    context = {
+        "first_name": request.user.first_name,
+        "last_name": request.user.last_name,
+        "name": event.name,
+        "city": event.city,
+        "state": event.state,
+        "country": event.country,
+        "start_date": event.start_date.strftime("%d/%m/%Y"),
+        "end_date": event.end_date.strftime("%d/%m/%Y"),
+        "emitted_at": timezone.now().strftime("%d/%m/%Y"),
+        "user": event.user.get_full_name()
+        or f"{event.user.first_name} {event.user.last_name}",
+    }
+
+    try:
+        html_string = loader.render_to_string(
+            template_name="certificates/default_certificate.html", context=context
+        )
+
+        html = HTML(string=html_string, base_url=request.build_absolute_url())
+
+        file = html.write_pdf()
+
+        response = HttpResponse(content=file, content_type="application/pdf")
+        filename = f"Certificado_{event.name.replace(" ", "_")}_{request.user.first_name}_{request.user.last_name}.pdf"
+
+        response["Content-Disposition"] = f'attachment; filename={filename}"'
+
+        return response
+
+    except Exception as e:
+        messages.error(
+            request=request, message=_("Ocorreu um erro ao gerar o certificado.")
+        )
+        return redirect("event_details", id=id)
+
+
+@login_required(login_url="landing_page")
+@student_only
+def certificates(request):
+    participations = EventParticipantModel.objects.filter(
+        user=request.user, status=EventParticipantModel.ParticipationStatus.PRESENT
+    ).select_related("event")
+
+    available_certificates = [
+        participation
+        for participation in participations
+        if participation.event.status == EventModel.Status.FINISHED
+    ]
+
+    context = {"available_certificates": available_certificates}
+
+    template = loader.get_template("events/my_certificates.html")
+    return HttpResponse(template.render(context=context, request=request))
