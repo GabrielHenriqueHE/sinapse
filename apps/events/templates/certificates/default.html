@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificado - Sinapse</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: white;
+        }
+        
+        .certificate-container {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            position: relative;
+            border: 15px double #4F46E5;
+            box-sizing: border-box;
+        }
+        
+        .certificate-content {
+            padding: 40px;
+            height: 100%;
+            position: relative;
+            background: linear-gradient(to bottom right, #faf5ff, #e0e7ff);
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 30%;
+            left: 10%;
+            font-size: 100px;
+            font-weight: bold;
+            color: #4F46E5;
+            opacity: 0.05;
+            transform: rotate(-45deg);
+            z-index: 1;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8B5CF6, #4F46E5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+        
+        .logo svg {
+            width: 30px;
+            height: 30px;
+            color: white;
+        }
+        
+        .company-name {
+            font-size: 36px;
+            font-weight: bold;
+            color: #1F2937;
+        }
+        
+        .certificate-title {
+            font-size: 18px;
+            color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 10px;
+        }
+        
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, transparent, #8B5CF6, transparent);
+            width: 70%;
+            margin: 30px auto;
+        }
+        
+        .main-content {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .participant-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4F46E5;
+            margin: 20px 0;
+        }
+        
+        .event-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1F2937;
+            margin: 25px 0;
+            background: linear-gradient(135deg, #8B5CF6, #4F46E5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .event-details {
+            font-size: 18px;
+            color: #4B5563;
+            line-height: 1.6;
+        }
+        
+        .message-box {
+            background: #EDE9FE;
+            border-left: 4px solid #8B5CF6;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        
+        .message-text {
+            font-style: italic;
+            color: #5B21B6;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .signatures {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .signature-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .signature-line {
+            width: 200px;
+            height: 1px;
+            background: #4F46E5;
+            margin: 0 auto 10px;
+        }
+        
+        .signature-label {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 5px;
+        }
+        
+        .signature-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1F2937;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #E5E7EB;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            color: #6B7280;
+        }
+        
+        .validation-code {
+            font-size: 11px;
+            color: #9CA3AF;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="certificate-content">
+            <!-- Marca d'água -->
+            <div class="watermark">SINAPSE</div>
+            
+            <!-- Cabeçalho -->
+            <div class="header">
+                <div class="logo-container">
+                    <div class="logo">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="company-name">Sinapse</div>
+                </div>
+                <div class="certificate-title">Certificado de Participação</div>
+            </div>
+            
+            <!-- Divisor -->
+            <div class="divider"></div>
+            
+            <!-- Conteúdo Principal -->
+            <div class="main-content">
+                <p style="font-size: 20px; color: #4B5563; margin-bottom: 20px;">
+                    Certificamos que
+                </p>
+                
+                <div class="participant-name">
+                    {{ first_name }} {{ last_name }}
+                </div>
+                
+                <p style="font-size: 20px; color: #4B5563; margin-bottom: 20px;">
+                    participou com sucesso do evento
+                </p>
+                
+                <div class="event-name">
+                    {{ name }}
+                </div>
+                
+                <div class="event-details">
+                    <p>Realizado em <strong>{{ city }}, {{ state }} - {{ country }}</strong></p>
+                    <p>No período de <strong>{{ start_date }}</strong> a <strong>{{ end_date }}</strong></p>
+                </div>
+            </div>
+            
+            <!-- Mensagem -->
+            <div class="message-box">
+                <p class="message-text">
+                    "Este certificado atesta a dedicação e o empenho demonstrados durante a participação 
+                    neste evento, contribuindo para o enriquecimento do conhecimento e fortalecimento da comunidade."
+                </p>
+            </div>
+            
+            <!-- Assinaturas -->
+            <div class="signatures">
+                <div class="signature-item">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Organizador do Evento</div>
+                    <div class="signature-name">{{ user }}</div>
+                </div>
+                
+                <div class="signature-item">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #8B5CF6, #4F46E5); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 30px; height: 30px; color: white;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                    </div>
+                    <div class="signature-label">Plataforma Sinapse</div>
+                    <div class="signature-name">Conectando Pessoas</div>
+                </div>
+                
+                <div class="signature-item">
+                    <div class="signature-line"></div>
+                    <div class="signature-label">Data de Emissão</div>
+                    <div class="signature-name">{{ emitted_at }}</div>
+                </div>
+            </div>
+            
+            <!-- Rodapé -->
+            <div class="footer">
+                <p class="footer-text">
+                    Certificado emitido digitalmente pela plataforma Sinapse.<br>
+                    Para validar este certificado, acesse: sinapse.com/validate
+                </p>
+                <p class="validation-code">
+                    ID: SNSP-{{ emitted_at|slice:"6:10" }}{{ emitted_at|slice:"3:5" }}{{ emitted_at|slice:"0:2" }}-{{ first_name|slice:":1"|upper }}{{ last_name|slice:":1"|upper }}-{{ name|slice:":3"|upper }}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
