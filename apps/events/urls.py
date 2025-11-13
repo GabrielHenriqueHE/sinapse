@@ -14,7 +14,8 @@ urlpatterns = [
     path("<uuid:id>/cancel", views.cancel_event, name="cancel_event"),
     path("<uuid:id>/attendance", views.event_attendance, name="event_attendance"),
     path("<uuid:id>/finish", views.finish_event, name="finish_event"),
-
     path("certificates", views.certificates, name="certificates"),
-    path("<uuid:id>/certificate", views.generate_certificate, name="generate_certificate")
+    path(
+        "<uuid:id>/certificate", views.generate_certificate, name="generate_certificate"
+    ),
 ]

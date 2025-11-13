@@ -1,3 +1,6 @@
+import os
+from io import BytesIO
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
@@ -10,8 +13,12 @@ from django.http import (
 from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.utils import timezone
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from weasyprint import HTML
+
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.pdfgen import canvas
 
 from apps.authentication.decorators import student_only, teacher_only
 from apps.authentication.models import UserModel
@@ -20,9 +27,9 @@ from apps.events.models import EventModel, EventParticipantModel
 
 
 def events(request: HttpRequest):
-    EventModel.objects.filter(
-        start_date__lte=timezone.now(), status__in=[EventModel.Status.OPEN]
-    ).update(status=EventModel.Status.CLOSED)
+    # EventModel.objects.filter(
+    #     start_date__lte=timezone.now(), status__in=[EventModel.Status.OPEN]
+    # ).update(status=EventModel.Status.CLOSED)
 
     user = request.user if request.user.is_authenticated else None
 
@@ -320,7 +327,6 @@ def finish_event(request: HttpRequest, id: int):
 
     if request.method == "POST":
         try:
-            # ✅ Usar update para evitar a validação do modelo completo
             EventModel.objects.filter(id=event.id).update(
                 status=EventModel.Status.FINISHED, updated_at=timezone.now()
             )
@@ -342,62 +348,116 @@ def finish_event(request: HttpRequest, id: int):
 @login_required(login_url="landing_page")
 @student_only
 def generate_certificate(request, id):
-    event = EventModel.objects.filter(id=id).first()
-
-    if not event:
-        return HttpResponseNotFound("Não foi possível localizar o evento.")
+    event = get_object_or_404(EventModel, id=id)
 
     participation = EventParticipantModel.objects.filter(
         event=event, user=request.user
     ).first()
 
-    if not participation:
-        messages.error(request=request, message=_("Você não participou deste evento."))
-        return redirect("event_details", id=id)
-
-    if participation.status != EventParticipantModel.ParticipationStatus.PRESENT:
+    if (
+        not participation
+        or participation.status != EventParticipantModel.ParticipationStatus.PRESENT
+    ):
         messages.error(
-            request=request,
-            message=_(
-                "Você precisa ter comparecido ao evento para gerar o certificado."
-            ),
+            request,
+            "Você não esteve presente neste evento ou não tem permissão para gerar o certificado.",
         )
         return redirect("event_details", id=id)
 
-    context = {
-        "first_name": request.user.first_name,
-        "last_name": request.user.last_name,
-        "name": event.name,
-        "city": event.city,
-        "state": event.state,
-        "country": event.country,
-        "start_date": event.start_date.strftime("%d/%m/%Y"),
-        "end_date": event.end_date.strftime("%d/%m/%Y"),
-        "emitted_at": timezone.now().strftime("%d/%m/%Y"),
-        "user": event.user.get_full_name()
-        or f"{event.user.first_name} {event.user.last_name}",
-    }
+    if event.status != EventModel.Status.FINISHED:
+        messages.error(
+            request, "O certificado estará disponível após a finalização do evento."
+        )
+        return redirect("event_details", id=id)
 
     try:
-        html_string = loader.render_to_string(
-            template_name="certificates/default_certificate.html", context=context
+        buffer = BytesIO()
+
+        p = canvas.Canvas(buffer, pagesize=landscape(A4))
+        width, height = landscape(A4)
+
+        p.setTitle(f"Certificado - {event.name}")
+
+        p.setFillColor(colors.HexColor("#F3F4F6"))
+        p.rect(0, 0, width, height, fill=1)
+
+        p.setStrokeColor(colors.HexColor("#4F46E5"))
+        p.setLineWidth(10)
+        p.rect(20, 20, width - 40, height - 40, stroke=1, fill=0)
+
+        p.setFillColor(colors.HexColor("#4F46E5"))
+        p.setFont("Helvetica-Bold", 28)
+        p.drawCentredString(width / 2, height - 100, "CERTIFICADO DE PARTICIPAÇÃO")
+
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 16)
+        p.drawCentredString(width / 2, height - 160, "Certificamos que")
+
+        p.setFillColor(colors.HexColor("#1F2937"))
+        p.setFont("Helvetica-Bold", 32)
+        participant_name = f"{request.user.first_name} {request.user.last_name}"
+        p.drawCentredString(width / 2, height - 220, participant_name)
+
+        p.setFillColor(colors.black)
+        p.setFont("Helvetica", 16)
+        p.drawCentredString(width / 2, height - 280, "participou com sucesso do evento")
+
+        p.setFillColor(colors.HexColor("#8B5CF6"))
+        p.setFont("Helvetica-Bold", 24)
+        p.drawCentredString(width / 2, height - 340, event.name)
+
+        p.setFillColor(colors.HexColor("#4B5563"))
+        p.setFont("Helvetica", 14)
+        p.drawCentredString(
+            width / 2,
+            height - 400,
+            f"Realizado em {event.city}, {event.state} - {event.country}",
+        )
+        p.drawCentredString(
+            width / 2,
+            height - 430,
+            f"No período de {event.start_date.strftime('%d/%m/%Y')} a {event.end_date.strftime('%d/%m/%Y')}",
         )
 
-        html = HTML(string=html_string, base_url=request.build_absolute_url())
+        p.setStrokeColor(colors.HexColor("#4F46E5"))
+        p.setLineWidth(1)
+        p.line(100, 150, 300, 150)
+        p.line(width / 2 - 100, 150, width / 2 + 100, 150)
+        p.line(width - 300, 150, width - 100, 150)
+        p.setFillColor(colors.HexColor("#6B7280"))
+        p.setFont("Helvetica", 12)
+        p.drawCentredString(200, 130, "Organizador do Evento")
+        p.drawCentredString(width / 2, 130, "Plataforma Sinapse")
+        p.drawCentredString(width - 200, 130, "Data de Emissão")
 
-        file = html.write_pdf()
+        p.setFillColor(colors.HexColor("#1F2937"))
+        p.setFont("Helvetica-Bold", 14)
+        p.drawCentredString(200, 100, event.user.get_full_name() or "Organizador")
+        p.drawCentredString(width / 2, 100, "Conectando Pessoas")
+        p.drawCentredString(width - 200, 100, timezone.now().strftime("%d/%m/%Y"))
 
-        response = HttpResponse(content=file, content_type="application/pdf")
-        filename = f"Certificado_{event.name.replace(" ", "_")}_{request.user.first_name}_{request.user.last_name}.pdf"
+        p.setFillColor(colors.HexColor("#6B7280"))
+        p.setFont("Helvetica", 10)
+        p.drawCentredString(
+            width / 2, 50, "Certificado emitido digitalmente pela plataforma Sinapse"
+        )
 
-        response["Content-Disposition"] = f'attachment; filename={filename}"'
+        p.showPage()
+        p.save()
+
+        pdf = buffer.getvalue()
+        buffer.close()
+
+        response = HttpResponse(content_type="application/pdf")
+        filename = f"certificado_{slugify(event.name)}_{slugify(request.user.first_name)}_{slugify(request.user.last_name)}.pdf"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        response.write(pdf)
 
         return response
 
     except Exception as e:
-        messages.error(
-            request=request, message=_("Ocorreu um erro ao gerar o certificado.")
-        )
+        print(f"Erro ao gerar certificado: {str(e)}")
+        messages.error(request, "Ocorreu um erro ao gerar o certificado.")
         return redirect("event_details", id=id)
 
 
