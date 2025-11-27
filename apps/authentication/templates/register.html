@@ -94,6 +94,58 @@
                     {% endif %}
                 </div>
 
+                <!-- NOVO CAMPO: Tipo de Conta -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Tipo de Conta *
+                    </label>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 p-4 focus:outline-none">
+                            <input type="radio" name="role" value="STUDENT" class="sr-only" 
+                                   {% if form.role.value == 'STUDENT' or not form.role.value %}checked{% endif %}>
+                            <div class="flex w-full items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm">
+                                        <p class="font-medium text-gray-900">Estudante</p>
+                                        <p class="text-gray-500">Participar de eventos</p>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 text-purple-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 p-4 focus:outline-none">
+                            <input type="radio" name="role" value="TEACHER" class="sr-only"
+                                   {% if form.role.value == 'TEACHER' %}checked{% endif %}>
+                            <div class="flex w-full items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm">
+                                        <p class="font-medium text-gray-900">Professor/Organizador</p>
+                                        <p class="text-gray-500">Criar e gerenciar eventos</p>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 text-purple-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    {% if form.role.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.role.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-2">
+                        Escolha o tipo de conta de acordo com sua necessidade
+                    </p>
+                </div>
+
                 <div>
                     <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">
                         Senha
@@ -148,4 +200,48 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Estilo para os cards de seleção de role */
+    input[name="role"]:checked + div {
+        background-color: #faf5ff;
+    }
+    
+    input[name="role"]:checked + div .text-purple-600 {
+        display: block;
+    }
+    
+    input[name="role"] + div .text-purple-600 {
+        display: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adicionar interatividade aos cards de seleção de role
+        const roleCards = document.querySelectorAll('input[name="role"]');
+        
+        roleCards.forEach(card => {
+            card.addEventListener('change', function() {
+                // Remover seleção de todos os cards
+                document.querySelectorAll('input[name="role"]').forEach(c => {
+                    c.parentElement.classList.remove('border-purple-500', 'bg-purple-50');
+                    c.parentElement.classList.add('border-gray-300');
+                });
+                
+                // Adicionar seleção ao card clicado
+                if (this.checked) {
+                    this.parentElement.classList.add('border-purple-500', 'bg-purple-50');
+                    this.parentElement.classList.remove('border-gray-300');
+                }
+            });
+            
+            // Inicializar estado dos cards
+            if (card.checked) {
+                card.parentElement.classList.add('border-purple-500', 'bg-purple-50');
+                card.parentElement.classList.remove('border-gray-300');
+            }
+        });
+    });
+</script>
 {% endblock %}

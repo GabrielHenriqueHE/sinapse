@@ -27,7 +27,13 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Cadastro realizado com sucesso!")
+            
+            # Mensagem personalizada baseada no tipo de conta
+            if user.role == 'TEACHER':
+                messages.success(request, "Cadastro realizado com sucesso! Agora você pode criar e gerenciar eventos.")
+            else:
+                messages.success(request, "Cadastro realizado com sucesso! Agora você pode participar de eventos.")
+                
             return redirect("events_index")
         else:
             messages.error(request, "Por favor, corrija os erros abaixo.")
@@ -56,7 +62,13 @@ def auth_login(request):
                 remember_me = form.cleaned_data.get("remember_me")
                 if not remember_me:
                     request.session.set_expiry(0)
-                messages.success(request, f"Bem-vindo de volta, {user.first_name}!")
+                    
+                # Mensagem personalizada baseada no tipo de conta
+                if user.role == 'TEACHER':
+                    messages.success(request, f"Bem-vindo de volta, Professor {user.first_name}!")
+                else:
+                    messages.success(request, f"Bem-vindo de volta, {user.first_name}!")
+                    
                 return redirect("events_index")
         else:
             messages.error(request, "Email ou senha inválidos.")

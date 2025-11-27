@@ -57,9 +57,11 @@
                                             ✅ Inscrito
                                         </button>
                                     {% else %}
-                                        <button class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
-                                            Participar do evento
-                                        </button>
+                                        <a href="{% url 'enroll_event' event.id %}">
+                                            <button class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
+                                                Participar do evento
+                                            </button>
+                                        </a>
                                     {% endif %}
                                 {% else %}
                                     <button class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed shadow-lg font-medium" disabled>
@@ -188,7 +190,7 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Categoria</p>
-                            <p class="font-bold text-gray-900">{{ event.category.name }}</p>
+                            <p class="font-bold text-gray-900">{{ event.category.name|capfirst }}</p>
                         </div>
                     </div>
 

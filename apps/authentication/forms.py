@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.core.exceptions import ValidationError
 
 from apps.authentication.models import UserModel
 
@@ -37,6 +38,19 @@ class CustomUserCreationForm(UserCreationForm):
         ),
     )
 
+    # NOVO CAMPO: Tipo de conta
+    role = forms.ChoiceField(
+        choices=UserModel.Role.choices,
+        required=True,
+        widget=forms.RadioSelect(
+            attrs={
+                "class": "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300",
+            }
+        ),
+        initial=UserModel.Role.STUDENT,
+        label="Tipo de Conta"
+    )
+
     password1 = forms.CharField(
         required=True,
         widget=forms.PasswordInput(
@@ -69,7 +83,13 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = UserModel
-        fields = ("first_name", "last_name", "email", "password1", "password2")
+        fields = ("first_name", "last_name", "email", "role", "password1", "password2")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remover a ajuda padrão de senha do Django (opcional)
+        self.fields['password1'].help_text = None
+        self.fields['password2'].help_text = None
 
 
 class CustomAuthenticationForm(AuthenticationForm):

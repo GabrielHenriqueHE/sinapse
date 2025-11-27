@@ -11,7 +11,6 @@ class UserManager(BaseUserManager):
         """
         Cria e salva um usuário com o e-mail e senha fornecidos.
         """
-
         if not email:
             raise ValueError("O usuário deve ter um endereço de e-mail!")
 
@@ -42,6 +41,7 @@ class UserModel(AbstractUser, BaseModel):
     class Role(models.TextChoices):
         STUDENT = "STUDENT", _("Estudante")
         TEACHER = "TEACHER", _("Professor")
+        ADMIN = "ADMIN", _("Administrador")
 
     username = None
 
@@ -66,3 +66,24 @@ class UserModel(AbstractUser, BaseModel):
     class Meta:
         db_table = "tb_users"
         indexes = [models.Index(fields=["email"])]
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.email})"
+
+    @property
+    def is_student(self):
+        return self.role == self.Role.STUDENT
+
+    @property
+    def is_teacher(self):
+        return self.role == self.Role.TEACHER
+
+    @property
+    def is_admin(self):
+        return self.role == self.Role.ADMIN
+
+    def get_full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def get_role_display_name(self):
+        return dict(self.Role.choices).get(self.role, self.role)
