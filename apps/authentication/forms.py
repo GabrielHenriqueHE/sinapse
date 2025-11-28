@@ -48,7 +48,7 @@ class CustomUserCreationForm(UserCreationForm):
             }
         ),
         initial=UserModel.Role.STUDENT,
-        label="Tipo de Conta"
+        label="Tipo de Conta",
     )
 
     password1 = forms.CharField(
@@ -88,8 +88,8 @@ class CustomUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Remover a ajuda padrão de senha do Django (opcional)
-        self.fields['password1'].help_text = None
-        self.fields['password2'].help_text = None
+        self.fields["password1"].help_text = None
+        self.fields["password2"].help_text = None
 
 
 class CustomAuthenticationForm(AuthenticationForm):

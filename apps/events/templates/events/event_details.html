@@ -270,7 +270,7 @@
                             {% if event.status != 'FINISHED' and event.status != 'CANCELED' %}
                                 <!-- Ações para eventos ativos -->
                                 <a href="{% url 'edit_event' event.id %}" class="w-full bg-gradient-to-br from-blue-500 to-purple-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition duration-300 text-center block font-medium">
-                                    Editar Evento
+                                    Editar evento
                                 </a>
                                 
                                 {% if event.attendance_available %}
@@ -279,12 +279,29 @@
                                     </a>
                                 {% else %}
                                     <button class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg cursor-not-allowed font-medium" disabled>
-                                        ⏳ Lista de Chamada (disponível após o evento)
+                                        ⏳ Lista de chamada (disponível após o evento)
+                                    </button>
+                                {% endif %}
+                            
+                                {% if event.status == 'OPEN' %}
+                                    <a href="{% url 'close_event' event.id %}" 
+                                    class="w-full border border-yellow-300 text-yellow-600 py-3 rounded-lg hover:bg-yellow-50 transition duration-300 text-center block font-medium">
+                                        🔒 Finalizar inscrições
+                                    </a>
+                                {% else %}
+                                    <button class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                        {% if event.status == 'CLOSED' %}
+                                            🔒 Inscrições encerradas
+                                        {% elif event.status == 'FINISHED' %}
+                                            ✅ Evento finalizado
+                                        {% else %}
+                                            ❌ Evento cancelado
+                                        {% endif %}
                                     </button>
                                 {% endif %}
                                 
-                                <a href="{% url 'cancel_event' event.id %}" class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 text-center block font-medium">
-                                    Cancelar Evento
+                                <a href="{% url 'cancel_event' event.id %}" class="w-full bg-red-600 text-white border hover:text-red-600 py-3 rounded-lg hover:bg-white hover:border-red-600 transition duration-300 text-center block font-medium">
+                                    Cancelar evento
                                 </a>
                             {% else %}
                                 <!-- Ações para eventos finalizados ou cancelados -->

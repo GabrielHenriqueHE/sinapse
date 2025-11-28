@@ -83,13 +83,15 @@ class EventForm(forms.ModelForm):
                 attrs={
                     "type": "datetime-local",
                     "class": "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300",
-                }
+                },
+                format="%Y-%m-%dT%H:%M",  # FORMATO CORRETO PARA datetime-local
             ),
             "end_date": forms.DateTimeInput(
                 attrs={
                     "type": "datetime-local",
                     "class": "appearance-none block w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300",
-                }
+                },
+                format="%Y-%m-%dT%H:%M",  # FORMATO CORRETO PARA datetime-local
             ),
             "participants_limit": forms.NumberInput(
                 attrs={
@@ -120,6 +122,18 @@ class EventForm(forms.ModelForm):
 
         # Garantir que campos da BaseModel não sejam validados como obrigatórios
         self.fields["country"].required = False
+
+        # CORREÇÃO: Forçar o formato correto para os campos de data
+        if self.instance and self.instance.pk:
+            # Converter as datas para o formato correto do input datetime-local
+            if self.instance.start_date:
+                self.initial["start_date"] = self.instance.start_date.strftime(
+                    "%Y-%m-%dT%H:%M"
+                )
+            if self.instance.end_date:
+                self.initial["end_date"] = self.instance.end_date.strftime(
+                    "%Y-%m-%dT%H:%M"
+                )
 
     def clean_topics(self):
         topics = self.cleaned_data.get("topics", "")

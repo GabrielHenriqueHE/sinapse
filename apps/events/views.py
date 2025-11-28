@@ -1,4 +1,3 @@
-import os
 from io import BytesIO
 
 from django.contrib import messages
@@ -15,7 +14,6 @@ from django.template import loader
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
@@ -27,10 +25,6 @@ from apps.events.models import EventModel, EventParticipantModel
 
 
 def events(request: HttpRequest):
-    # EventModel.objects.filter(
-    #     start_date__lte=timezone.now(), status__in=[EventModel.Status.OPEN]
-    # ).update(status=EventModel.Status.CLOSED)
-
     user = request.user if request.user.is_authenticated else None
 
     new = EventModel.objects.filter(start_date__gte=timezone.now()).order_by(
@@ -189,7 +183,11 @@ def edit_event(request: HttpRequest, id: int):
                                 request,
                                 "A data de término deve ser posterior à data de início.",
                             )
-                            context = {"form": form, "event": event}
+                            context = {
+                                "form": form,
+                                "event": event,
+                                "now": timezone.now(),
+                            }
                             template = loader.get_template("events/edit_event.html")
                             return HttpResponse(template.render(context, request))
 
@@ -202,7 +200,7 @@ def edit_event(request: HttpRequest, id: int):
                         f"Não é possível definir o limite para {updated.participants_limit} "
                         f"porque o evento já tem {event.participants.count()} participantes.",
                     )
-                    context = {"form": form, "event": event}
+                    context = {"form": form, "event": event, "now": timezone.now()}
                     template = loader.get_template("events/edit_event.html")
                     return HttpResponse(template.render(context, request))
 
@@ -217,9 +215,54 @@ def edit_event(request: HttpRequest, id: int):
     else:
         form = EventForm(instance=event)
 
-    context = {"form": form, "event": event}
+    # ADICIONAR: Passar o contexto 'now' para o template
+    context = {"form": form, "event": event, "now": timezone.now()}
     template = loader.get_template("events/edit_event.html")
     return HttpResponse(template.render(context, request))
+
+
+@login_required(login_url="landing_page")
+@teacher_only
+def close_event(request, id):
+    """View para fechar inscrições do evento"""
+    event = EventModel.objects.filter(id=id).first()
+
+    if not event:
+        return HttpResponseNotFound()
+
+    if not event.user == request.user:
+        return HttpResponseForbidden()
+
+    if event.start_date <= timezone.now():
+        messages.error(
+            request, "Não é possível fechar inscrições de um evento que já começou."
+        )
+        return redirect("event_details", id=id)
+
+    if event.status == EventModel.Status.CLOSED:
+        messages.warning(request, "As inscrições deste evento já estão fechadas.")
+        return redirect("event_details", id=id)
+
+    if event.status in [EventModel.Status.CANCELED, EventModel.Status.FINISHED]:
+        messages.error(
+            request,
+            "Não é possível fechar inscrições de um evento cancelado ou finalizado.",
+        )
+        return redirect("event_details", id=id)
+
+    try:
+        event.status = EventModel.Status.CLOSED
+        event.save()
+
+        messages.success(
+            request,
+            "Inscrições fechadas com sucesso! Os participantes atuais mantêm suas vagas, mas novas inscrições não serão aceitas.",
+        )
+
+    except Exception as e:
+        messages.error(request, f"Erro ao fechar inscrições: {str(e)}")
+
+    return redirect("event_details", id=id)
 
 
 @login_required(login_url="landing_page")
@@ -286,10 +329,8 @@ def event_attendance(request: HttpRequest, id):
 
         return redirect("event_attendance", id=id)
 
-    # Busca participantes
     participants = event.participants_records.all()
 
-    # Calcula estatísticas
     present_count = participants.filter(status="PRESENT").count()
     total_count = participants.count()
 
