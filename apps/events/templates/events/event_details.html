@@ -45,7 +45,7 @@
                                     </a>
                                     {% else %}
                                     <button class="bg-gray-400 text-white px-6 py-3 rounded-lg cursor-not-allowed shadow-lg font-medium" disabled>
-                                        {% if event.status == 'FINISHED' %}✅ Evento Finalizado{% else %}❌ Evento Cancelado{% endif %}
+                                        {% if event.status == 'FINISHED' %}✅ Evento finalizado{% else %}❌ Evento cancelado{% endif %}
                                     </button>
                                     {% endif %}
                                 </div>
@@ -162,8 +162,19 @@
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">Data do evento</p>
-                            <p class="font-bold text-gray-900">{{ event.start_date|date:"d F Y" }}</p>
-                            <p class="text-sm text-gray-500">{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</p>
+                            {% if event.start_date.date == event.end_date.date %}
+                                <!-- Mesmo dia -->
+                                <p class="font-bold text-gray-900">{{ event.start_date|date:"d F Y" }}</p>
+                                <p class="text-sm text-gray-500">{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</p>
+                            {% else %}
+                                <!-- Diferentes dias -->
+                                <p class="font-bold text-gray-900">
+                                    {{ event.start_date|date:"d F Y" }} - {{ event.end_date|date:"d F Y" }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    {{ event.start_date|date:"H:i" }} até {{ event.end_date|date:"d/m H:i" }}
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -331,7 +342,7 @@
                                                 <!-- Usuário com presença confirmada -->
                                                 <a href="{% url 'generate_certificate' event.id %}" 
                                                    class="w-full bg-gradient-to-br from-green-500 to-teal-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 text-center block font-medium">
-                                                    📄 Baixar Certificado
+                                                    📄 Baixar certificado
                                                 </a>
                                             {% elif participation.status == 'ABSENT' %}
                                                 <!-- Usuário marcado como ausente -->

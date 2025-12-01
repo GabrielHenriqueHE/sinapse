@@ -30,7 +30,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
           </svg>
-          <span>Criar Evento</span>
+          <span>Criar evento</span>
         </a>
         {% endif %}
         <div class="flex space-x-2">
@@ -146,7 +146,7 @@
               
               <!-- Categoria -->
               <span class="absolute top-4 left-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm">
-                {{ event.category.name }}
+                {{ event.category.name|capfirst }}
               </span>
               
               <!-- Status da Inscrição -->
@@ -218,7 +218,7 @@
               </p>
               {% if user.role == 'TEACHER' %}
               <a href="{% url 'create_event' %}" class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300">
-                Criar Evento
+                Criar evento
               </a>
               {% else %}
               <button onclick="document.getElementById('popularCarousel').scrollIntoView({behavior: 'smooth'})" class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300">
@@ -279,7 +279,7 @@
               
               <!-- Categoria -->
               <span class="absolute top-4 left-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm">
-                {{ event.category.name }}
+                {{ event.category.name|capfirst }}
               </span>
               
               <!-- Status do Evento -->
@@ -359,7 +359,7 @@
               </p>
               {% if user.is_authenticated and user.role == 'TEACHER' %}
               <a href="{% url 'create_event' %}" class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300">
-                Criar Evento
+                Criar evento
               </a>
               {% endif %}
             </div>
@@ -415,7 +415,7 @@
               
               <!-- Categoria -->
               <span class="absolute top-4 left-4 bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm">
-                {{ event.category.name }}
+                {{ event.category.name|capfirst }}
               </span>
               
               <!-- Status do Evento -->
@@ -495,7 +495,7 @@
               </p>
               {% if user.is_authenticated and user.role == 'TEACHER' %}
               <a href="{% url 'create_event' %}" class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-6 py-2 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300">
-                Criar Evento
+                Criar evento
               </a>
               {% endif %}
             </div>

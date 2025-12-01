@@ -1,3 +1,4 @@
+# apps/events/views.py
 from io import BytesIO
 
 from django.contrib import messages
@@ -14,15 +15,29 @@ from django.template import loader
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer,
+    Table,
+    TableStyle,
+    KeepTogether,
+)
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.units import cm
+from reportlab.lib import colors
 
 from apps.authentication.decorators import student_only, teacher_only
 from apps.authentication.models import UserModel
 from apps.events.forms import EventForm
 from apps.events.models import EventModel, EventParticipantModel
 
+
+# =====================================================================
+# LISTAGEM DE EVENTOS
+# =====================================================================
 
 def events(request: HttpRequest):
     user = request.user if request.user.is_authenticated else None
@@ -57,6 +72,10 @@ def events(request: HttpRequest):
     return HttpResponse(template.render(context=context, request=request))
 
 
+# =====================================================================
+# CRUD DE EVENTOS
+# =====================================================================
+
 @login_required(login_url="landing_page")
 @teacher_only
 def create_event(request):
@@ -76,10 +95,8 @@ def create_event(request):
                 return redirect("events_index")
 
             except Exception as e:
-                print(e)
                 messages.error(request, f"Erro ao criar evento: {str(e)}")
         else:
-            print("Form errors:", form.errors)
             messages.error(request, "Por favor, corrija os erros no formulário.")
     else:
         form = EventForm()
@@ -93,9 +110,7 @@ def event_details(request, id):
     event = EventModel.objects.filter(id=id).first()
 
     if not event:
-        return (
-            HttpResponseNotFound()
-        )  # TODO: adicionar redirect para uma view user-friendly
+        return HttpResponseNotFound()
 
     context = {"event": event}
 
@@ -109,27 +124,23 @@ def enroll_event(request, id):
     event = EventModel.objects.filter(id=id).first()
 
     if not event:
-        return (
-            HttpResponseNotFound()
-        )  # TODO: adicionar redirect para uma view user-friendly
+        return HttpResponseNotFound()
 
     if event.status != EventModel.Status.OPEN:
-        messages.error(
-            request=request, message=_("Este evento não está aceitando inscrições.")
-        )
-        return redirect(to="event_details", id=id)
+        messages.error(request, _("Este evento não está aceitando inscrições."))
+        return redirect("event_details", id=id)
 
     if event.is_full:
-        messages.error(request=request, message=_("Este evento está lotado."))
-        return redirect(to="event_details", id=id)
+        messages.error(request, _("Este evento está lotado."))
+        return redirect("event_details", id=id)
 
     if request.user in event.participants.all():
-        messages.info(request=request, message=_("Você já está inscrito neste evento."))
+        messages.info(request, _("Você já está inscrito neste evento."))
 
     event.participants.add(request.user)
-    messages.success(request=request, message=_("Inscrição realizada com sucesso!"))
+    messages.success(request, _("Inscrição realizada com sucesso!"))
 
-    return redirect(to="event_details", id=id)
+    return redirect("event_details", id=id)
 
 
 @login_required(login_url="landing_page")
@@ -138,19 +149,15 @@ def cancel_enrollment(request, id):
     event = EventModel.objects.filter(id=id).first()
 
     if not event:
-        return (
-            HttpResponseNotFound()
-        )  # TODO: adicionar redirect para uma view user-friendly
+        return HttpResponseNotFound()
 
     if request.user not in event.participants.all():
-        messages.error(
-            request=request, message=_("Você não estava inscrito neste evento.")
-        )
+        messages.error(request, _("Você não estava inscrito neste evento."))
 
     event.participants.remove(request.user)
-    messages.success(request=request, message=_("Inscrição cancelada com sucesso."))
+    messages.success(request, _("Inscrição cancelada com sucesso."))
 
-    return redirect(to="event_details", id=id)
+    return redirect("event_details", id=id)
 
 
 @login_required(login_url="landing_page")
@@ -215,7 +222,6 @@ def edit_event(request: HttpRequest, id: int):
     else:
         form = EventForm(instance=event)
 
-    # ADICIONAR: Passar o contexto 'now' para o template
     context = {"form": form, "event": event, "now": timezone.now()}
     template = loader.get_template("events/edit_event.html")
     return HttpResponse(template.render(context, request))
@@ -224,7 +230,6 @@ def edit_event(request: HttpRequest, id: int):
 @login_required(login_url="landing_page")
 @teacher_only
 def close_event(request, id):
-    """View para fechar inscrições do evento"""
     event = EventModel.objects.filter(id=id).first()
 
     if not event:
@@ -256,7 +261,7 @@ def close_event(request, id):
 
         messages.success(
             request,
-            "Inscrições fechadas com sucesso! Os participantes atuais mantêm suas vagas, mas novas inscrições não serão aceitas.",
+            "Inscrições fechadas com sucesso! Os participantes atuais mantêm suas vagas.",
         )
 
     except Exception as e:
@@ -295,8 +300,12 @@ def cancel_event(request, id):
 
     context = {"event": event}
     template = loader.get_template("events/cancel_event.html")
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request=request))
 
+
+# =====================================================================
+# PRESENÇA E FINALIZAÇÃO
+# =====================================================================
 
 @login_required(login_url="landing_page")
 @teacher_only
@@ -309,8 +318,9 @@ def event_attendance(request: HttpRequest, id):
     if request.user != event.user:
         return redirect("event_details", id=id)
 
-    if event.end_date > timezone.now():
-        return redirect("event_details", id=id)
+    if event.end_date <= timezone.now() and event.status != EventModel.Status.FINISHED:
+        auto_finish_event(event)
+        event.refresh_from_db()
 
     if request.method == "POST":
         participant_id = request.POST.get("participant_id")
@@ -324,7 +334,15 @@ def event_attendance(request: HttpRequest, id):
                 messages.success(
                     request, f"Status de {record.user.get_full_name()} atualizado."
                 )
-            except Exception as e:
+
+                if (
+                    event.end_date <= timezone.now()
+                    and event.status != EventModel.Status.FINISHED
+                ):
+                    auto_finish_event(event)
+                    event.refresh_from_db()
+
+            except Exception:
                 messages.error(request, "Erro ao atualizar.")
 
         return redirect("event_attendance", id=id)
@@ -342,13 +360,12 @@ def event_attendance(request: HttpRequest, id):
     }
 
     template = loader.get_template("events/event_attendance_list.html")
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request=request))
 
 
 @login_required(login_url="landing_page")
 @teacher_only
 def finish_event(request: HttpRequest, id: int):
-    """View para finalizar evento após lista de chamada"""
     event = get_object_or_404(EventModel, id=id)
 
     if request.user != event.user:
@@ -383,12 +400,21 @@ def finish_event(request: HttpRequest, id: int):
 
     context = {"event": event}
     template = loader.get_template("events/finish_event.html")
-    return HttpResponse(template.render(context, request))
+    return HttpResponse(template.render(context, request=request))
 
+
+# =====================================================================
+# NOVA FUNÇÃO — CERTIFICADO VIA PLATYPUS/REPORTLAB (PDF-native)
+# =====================================================================
 
 @login_required(login_url="landing_page")
 @student_only
 def generate_certificate(request, id):
+    """
+    Gera um PDF de certificado estilizado usando ReportLab Platypus.
+    Design inspirado no template HTML original, mas desenhado com flowables
+    — roda em Windows/Linux sem dependências externas além do ReportLab.
+    """
     event = get_object_or_404(EventModel, id=id)
 
     participation = EventParticipantModel.objects.filter(
@@ -405,117 +431,298 @@ def generate_certificate(request, id):
         )
         return redirect("event_details", id=id)
 
+    # tentar finalizar automaticamente se aplicável
     if event.status != EventModel.Status.FINISHED:
-        messages.error(
-            request, "O certificado estará disponível após a finalização do evento."
-        )
-        return redirect("event_details", id=id)
+        was_finished = auto_finish_event(event)
+        if not was_finished:
+            messages.error(
+                request,
+                "O certificado estará disponível após a finalização do evento e confirmação de presença.",
+            )
+            return redirect("event_details", id=id)
+        else:
+            event.refresh_from_db()
 
     try:
         buffer = BytesIO()
 
-        p = canvas.Canvas(buffer, pagesize=landscape(A4))
-        width, height = landscape(A4)
+        doc = SimpleDocTemplate(
+            buffer,
+            pagesize=landscape(A4),
+            leftMargin=2 * cm,
+            rightMargin=2 * cm,
+            topMargin=2 * cm,
+            bottomMargin=2 * cm,
+            title=f"Certificado - {event.name}",
+        )
 
-        p.setTitle(f"Certificado - {event.name}")
+        # Styles
+        base_styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            "certificate_title",
+            parent=base_styles["Title"],
+            fontName="Helvetica-Bold",
+            fontSize=28,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#4F46E5"),
+            spaceAfter=12,
+        )
 
-        p.setFillColor(colors.HexColor("#F3F4F6"))
-        p.rect(0, 0, width, height, fill=1)
+        normal_center = ParagraphStyle(
+            "normal_center",
+            parent=base_styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=16,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#374151"),
+            leading=22,
+        )
 
-        p.setStrokeColor(colors.HexColor("#4F46E5"))
-        p.setLineWidth(10)
-        p.rect(20, 20, width - 40, height - 40, stroke=1, fill=0)
+        participant_style = ParagraphStyle(
+            "participant",
+            parent=base_styles["Heading1"],
+            fontName="Helvetica-Bold",
+            fontSize=34,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#4F46E5"),
+            leading=36,
+            spaceAfter=6,
+        )
 
-        p.setFillColor(colors.HexColor("#4F46E5"))
-        p.setFont("Helvetica-Bold", 28)
-        p.drawCentredString(width / 2, height - 100, "CERTIFICADO DE PARTICIPAÇÃO")
+        event_style = ParagraphStyle(
+            "event",
+            parent=base_styles["Heading2"],
+            fontName="Helvetica-Bold",
+            fontSize=24,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#8B5CF6"),
+            leading=28,
+            spaceAfter=6,
+        )
 
-        p.setFillColor(colors.black)
-        p.setFont("Helvetica", 16)
-        p.drawCentredString(width / 2, height - 160, "Certificamos que")
+        details_style = ParagraphStyle(
+            "details",
+            parent=base_styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=14,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#4B5563"),
+            leading=20,
+            spaceAfter=6,
+        )
 
-        p.setFillColor(colors.HexColor("#1F2937"))
-        p.setFont("Helvetica-Bold", 32)
+        # Story setup
+        story = []
+
+        # Header / Title
+        story.append(Spacer(1, 1 * cm))
+        story.append(Paragraph("CERTIFICADO DE PARTICIPAÇÃO", title_style))
+        story.append(Spacer(1, 0.4 * cm))
+
+        story.append(Paragraph("Certificamos que", normal_center))
+        story.append(Spacer(1, 0.2 * cm))
+
         participant_name = f"{request.user.first_name} {request.user.last_name}"
-        p.drawCentredString(width / 2, height - 220, participant_name)
+        story.append(Paragraph(participant_name, participant_style))
+        story.append(Spacer(1, 0.2 * cm))
 
-        p.setFillColor(colors.black)
-        p.setFont("Helvetica", 16)
-        p.drawCentredString(width / 2, height - 280, "participou com sucesso do evento")
+        story.append(Paragraph("participou com sucesso do evento", normal_center))
+        story.append(Spacer(1, 0.4 * cm))
 
-        p.setFillColor(colors.HexColor("#8B5CF6"))
-        p.setFont("Helvetica-Bold", 24)
-        p.drawCentredString(width / 2, height - 340, event.name)
+        story.append(Paragraph(event.name, event_style))
+        story.append(Spacer(1, 0.3 * cm))
 
-        p.setFillColor(colors.HexColor("#4B5563"))
-        p.setFont("Helvetica", 14)
-        p.drawCentredString(
-            width / 2,
-            height - 400,
-            f"Realizado em {event.city}, {event.state} - {event.country}",
+        # Calcular carga horária (diferença entre start_date e end_date)
+        if event.start_date and event.end_date:
+            # Calcular diferença em horas
+            time_difference = event.end_date - event.start_date
+            total_hours = time_difference.total_seconds() / 3600
+            # Arredondar para 1 casa decimal
+            duration_hours = round(total_hours, 1)
+            
+            # Formatar datas para exibição
+            start_date_str = event.start_date.strftime("%d/%m/%Y %H:%M")
+            end_date_str = event.end_date.strftime("%d/%m/%Y %H:%M")
+            
+            # Verificar se é no mesmo dia
+            if event.start_date.date() == event.end_date.date():
+                date_range_str = f"<b>{event.start_date.strftime('%d/%m/%Y')}</b><br/>"
+                time_range_str = f"Das <b>{event.start_date.strftime('%H:%M')}</b> às <b>{event.end_date.strftime('%H:%M')}</b>"
+            else:
+                date_range_str = f"De <b>{event.start_date.strftime('%d/%m/%Y %H:%M')}</b><br/>"
+                time_range_str = f"Até <b>{event.end_date.strftime('%d/%m/%Y %H:%M')}</b>"
+        else:
+            duration_hours = 0
+            date_range_str = "Data não especificada"
+            time_range_str = ""
+
+        # Event details block
+        details_html = (
+            f"Realizado em <b>{event.city}, {event.state} - {event.country}</b><br/>"
+            f"{date_range_str}"
+            f"{time_range_str}<br/>"
+            f"Carga horária total de <b>{duration_hours} horas</b>"
         )
-        p.drawCentredString(
-            width / 2,
-            height - 430,
-            f"No período de {event.start_date.strftime('%d/%m/%Y')} a {event.end_date.strftime('%d/%m/%Y')}",
+        story.append(Paragraph(details_html, details_style))
+        story.append(Spacer(1, 1.2 * cm))
+
+        # Data de emissão
+        emission_date = timezone.now().strftime("%d/%m/%Y")
+        emission_text = f"Emitido digitalmente em {emission_date} através da plataforma Sinapse"
+        story.append(Paragraph(emission_text, ParagraphStyle(
+            "emission",
+            parent=base_styles["BodyText"],
+            fontName="Helvetica-Oblique",
+            fontSize=12,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#6B7280"),
+            leading=16,
+        )))
+        story.append(Spacer(1, 0.6 * cm))
+
+        # ID do certificado
+        cert_id = (
+            f"SNSP-{timezone.now().strftime('%Y%m%d')}-"
+            f"{(request.user.first_name[:1] or '').upper()}{(request.user.last_name[:1] or '').upper()}-"
+            f"{(event.name[:3] or '').upper()}"
         )
+        cert_para = Paragraph(cert_id, ParagraphStyle(
+            "cert_id",
+            parent=base_styles["BodyText"],
+            fontName="Helvetica",
+            fontSize=9,
+            alignment=TA_CENTER,
+            textColor=colors.HexColor("#9CA3AF"),
+        ))
+        story.append(cert_para)
 
-        p.setStrokeColor(colors.HexColor("#4F46E5"))
-        p.setLineWidth(1)
-        p.line(100, 150, 300, 150)
-        p.line(width / 2 - 100, 150, width / 2 + 100, 150)
-        p.line(width - 300, 150, width - 100, 150)
-        p.setFillColor(colors.HexColor("#6B7280"))
-        p.setFont("Helvetica", 12)
-        p.drawCentredString(200, 130, "Organizador do Evento")
-        p.drawCentredString(width / 2, 130, "Plataforma Sinapse")
-        p.drawCentredString(width - 200, 130, "Data de Emissão")
+        def draw_background(canvas_obj, doc_obj):
+            w, h = landscape(A4)
+            canvas_obj.saveState()
 
-        p.setFillColor(colors.HexColor("#1F2937"))
-        p.setFont("Helvetica-Bold", 14)
-        p.drawCentredString(200, 100, event.user.get_full_name() or "Organizador")
-        p.drawCentredString(width / 2, 100, "Conectando Pessoas")
-        p.drawCentredString(width - 200, 100, timezone.now().strftime("%d/%m/%Y"))
+            # Background fill
+            canvas_obj.setFillColor(colors.HexColor("#F3F4F6"))
+            canvas_obj.rect(0, 0, w, h, stroke=0, fill=1)
 
-        p.setFillColor(colors.HexColor("#6B7280"))
-        p.setFont("Helvetica", 10)
-        p.drawCentredString(
-            width / 2, 50, "Certificado emitido digitalmente pela plataforma Sinapse"
-        )
+            # Outer decorative border
+            canvas_obj.setStrokeColor(colors.HexColor("#4F46E5"))
+            canvas_obj.setLineWidth(10)
+            canvas_obj.rect(20, 20, w - 40, h - 40, stroke=1, fill=0)
 
-        p.showPage()
-        p.save()
+            # Inner subtle border
+            canvas_obj.setStrokeColor(colors.Color(0.545, 0.361, 0.961, alpha=0.18))
+            canvas_obj.setLineWidth(2)
+            canvas_obj.rect(36, 36, w - 72, h - 72, stroke=1, fill=0)
 
-        pdf = buffer.getvalue()
+            # Central watermark "SINAPSE"
+            watermark_color = colors.Color(79/255, 70/255, 229/255, alpha=0.06)
+            canvas_obj.setFillColor(watermark_color)
+            canvas_obj.setFont("Helvetica-Bold", 120)
+
+            canvas_obj.saveState()
+            canvas_obj.translate(w / 2.0, h / 2.0)
+            canvas_obj.rotate(-25)
+            canvas_obj.drawCentredString(0, 0, "SINAPSE")
+            canvas_obj.restoreState()
+
+            # Footer ID
+            canvas_obj.setFillColor(colors.HexColor("#D1D5DB"))
+            canvas_obj.setFont("Helvetica", 9)
+            canvas_obj.drawRightString(w - 30, 25, f"Certificado ID: {cert_id}")
+
+            canvas_obj.restoreState()
+
+        # Build PDF
+        doc.build(story, onFirstPage=draw_background, onLaterPages=draw_background)
+
+        pdf_value = buffer.getvalue()
         buffer.close()
 
-        response = HttpResponse(content_type="application/pdf")
         filename = f"certificado_{slugify(event.name)}_{slugify(request.user.first_name)}_{slugify(request.user.last_name)}.pdf"
+        response = HttpResponse(pdf_value, content_type="application/pdf")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
-        response.write(pdf)
-
         return response
 
     except Exception as e:
-        print(f"Erro ao gerar certificado: {str(e)}")
+        # Logging em stdout para facilitar debug (substitua por logger se desejar)
+        print(f"Erro ao gerar certificado: {e}")
         messages.error(request, "Ocorreu um erro ao gerar o certificado.")
         return redirect("event_details", id=id)
 
 
+# =====================================================================
+# LISTAGEM DE CERTIFICADOS
+# =====================================================================
+
 @login_required(login_url="landing_page")
 @student_only
 def certificates(request):
-    participations = EventParticipantModel.objects.filter(
-        user=request.user, status=EventParticipantModel.ParticipationStatus.PRESENT
+    user_participations = EventParticipantModel.objects.filter(
+        user=request.user
     ).select_related("event")
 
-    available_certificates = [
-        participation
-        for participation in participations
-        if participation.event.status == EventModel.Status.FINISHED
-    ]
+    for participation in user_participations:
+        event = participation.event
+        if event.end_date <= timezone.now() and event.status not in [
+            EventModel.Status.FINISHED,
+            EventModel.Status.CANCELED,
+        ]:
+            auto_finish_event(event)
+
+    available_certificates = EventParticipantModel.objects.filter(
+        user=request.user,
+        status=EventParticipantModel.ParticipationStatus.PRESENT,
+        event__status=EventModel.Status.FINISHED,
+    ).select_related("event")
+
+    print(available_certificates)
 
     context = {"available_certificates": available_certificates}
 
     template = loader.get_template("events/my_certificates.html")
     return HttpResponse(template.render(context=context, request=request))
+
+
+# =====================================================================
+# AUXILIARES
+# =====================================================================
+
+def auto_finish_event(event: EventModel) -> bool:
+    """
+    Finaliza automaticamente um evento se:
+    1. A data de término já passou
+    2. O evento não está cancelado
+    3. A lista de chamada foi feita (pelo menos um participante com status definido)
+    Retorna True se o evento foi finalizado, False caso contrário
+    """
+    if event.status in [EventModel.Status.FINISHED, EventModel.Status.CANCELED]:
+        return False
+
+    if event.end_date > timezone.now():
+        return False
+
+    # Verificar se há pelo menos um participante com status definido (lista de chamada feita)
+    has_attendance_records = event.participants_records.filter(
+        status__in=["PRESENT", "ABSENT"]
+    ).exists()
+
+    if not has_attendance_records:
+        return False
+
+    try:
+        event.status = EventModel.Status.FINISHED
+        event.save()
+        return True
+    except Exception:
+        return False
+
+
+def can_generate_certificates(event: EventModel) -> bool:
+    """
+    Verifica se o evento está em condições de gerar certificados
+    """
+    return (
+        event.status == EventModel.Status.FINISHED
+        and event.end_date <= timezone.now()
+        and event.participants_records.filter(status="PRESENT").exists()
+    )
