@@ -1,9 +1,9 @@
-# apps/events/views.py
 from io import BytesIO
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import models
+from django.core.exceptions import PermissionDenied  # ADICIONE ESTE IMPORT
+from django.db import models, transaction
 from django.http import (
     HttpRequest,
     HttpResponse,
@@ -15,31 +15,164 @@ from django.template import loader
 from django.utils import timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer,
-    Table,
-    TableStyle,
-    KeepTogether,
-)
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.units import cm
 from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import cm
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
 from apps.authentication.decorators import student_only, teacher_only
 from apps.authentication.models import UserModel
 from apps.events.forms import EventForm
 from apps.events.models import EventModel, EventParticipantModel
 
+# =====================================================================
+# FUNÇÕES AUXILIARES
+# =====================================================================
+
+
+def auto_close_event(event_id: int) -> bool:
+    """
+    Fecha automaticamente um evento se:
+    1. O horário de início já passou
+    2. O evento está com status OPEN
+    3. O evento não está cancelado ou finalizado
+
+    Retorna True se o evento foi fechado, False caso contrário
+    """
+    try:
+        with transaction.atomic():
+            event = EventModel.objects.select_for_update().get(id=event_id)
+
+            if event.status != EventModel.Status.OPEN:
+                return False
+
+            if event.start_date > timezone.now():
+                return False
+
+            # Atualizar apenas o status, sem passar pelo formulário
+            EventModel.objects.filter(id=event_id).update(
+                status=EventModel.Status.CLOSED, updated_at=timezone.now()
+            )
+            return True
+
+    except EventModel.DoesNotExist:
+        return False
+    except Exception as e:
+        print(f"Erro ao fechar evento automaticamente {event_id}: {str(e)}")
+        return False
+
+
+def auto_finish_event(event_id: int) -> bool:
+    """
+    Finaliza automaticamente um evento se:
+    1. A data de término já passou
+    2. O evento não está cancelado
+    3. A lista de chamada foi feita (pelo menos um participante com status definido)
+
+    Retorna True se o evento foi finalizado, False caso contrário
+    """
+    try:
+        with transaction.atomic():
+            event = EventModel.objects.select_for_update().get(id=event_id)
+
+            if event.status in [EventModel.Status.FINISHED, EventModel.Status.CANCELED]:
+                return False
+
+            if event.end_date > timezone.now():
+                return False
+
+            # Verificar se há pelo menos um participante com status definido (lista de chamada feita)
+            has_attendance_records = event.participants_records.filter(
+                status__in=["PRESENT", "ABSENT"]
+            ).exists()
+
+            if not has_attendance_records:
+                return False
+
+            # Atualizar apenas o status, sem passar pelo formulário
+            EventModel.objects.filter(id=event_id).update(
+                status=EventModel.Status.FINISHED, updated_at=timezone.now()
+            )
+            return True
+
+    except EventModel.DoesNotExist:
+        return False
+    except Exception as e:
+        print(f"Erro ao finalizar evento automaticamente {event_id}: {str(e)}")
+        return False
+
+
+def update_event_status(event: EventModel) -> EventModel:
+    """
+    Atualiza o status do evento automaticamente baseado nas datas atuais
+    Retorna o evento atualizado
+    """
+    now = timezone.now()
+
+    # Se o evento já está cancelado ou finalizado, não faz nada
+    if event.status in [EventModel.Status.CANCELED, EventModel.Status.FINISHED]:
+        return event
+
+    # Verificar se deve fechar automaticamente
+    if event.status == EventModel.Status.OPEN and event.start_date <= now:
+        was_closed = auto_close_event(event.id)
+        if was_closed:
+            event.refresh_from_db()
+
+    # Verificar se deve finalizar automaticamente
+    if event.status == EventModel.Status.CLOSED and event.end_date <= now:
+        was_finished = auto_finish_event(event.id)
+        if was_finished:
+            event.refresh_from_db()
+
+    return event
+
+
+def can_generate_certificates(event: EventModel) -> bool:
+    """
+    Verifica se o evento está em condições de gerar certificados
+    """
+    return (
+        event.status == EventModel.Status.FINISHED
+        and event.end_date <= timezone.now()
+        and event.participants_records.filter(status="PRESENT").exists()
+    )
+
+
+def update_events_status_bulk():
+    """
+    Atualiza o status de todos os eventos que precisam ser atualizados
+    """
+    now = timezone.now()
+
+    # Eventos que devem ser fechados automaticamente
+    events_to_close = EventModel.objects.filter(
+        status=EventModel.Status.OPEN, start_date__lte=now
+    ).values_list("id", flat=True)
+
+    for event_id in events_to_close:
+        auto_close_event(event_id)
+
+    # Eventos que devem ser finalizados automaticamente
+    events_to_finish = EventModel.objects.filter(
+        status=EventModel.Status.CLOSED, end_date__lte=now
+    ).values_list("id", flat=True)
+
+    for event_id in events_to_finish:
+        auto_finish_event(event_id)
+
 
 # =====================================================================
 # LISTAGEM DE EVENTOS
 # =====================================================================
 
+
 def events(request: HttpRequest):
+    # Atualizar status de eventos em lote antes de listar
+    update_events_status_bulk()
+
     user = request.user if request.user.is_authenticated else None
 
     new = EventModel.objects.filter(start_date__gte=timezone.now()).order_by(
@@ -75,6 +208,7 @@ def events(request: HttpRequest):
 # =====================================================================
 # CRUD DE EVENTOS
 # =====================================================================
+
 
 @login_required(login_url="landing_page")
 @teacher_only
@@ -112,6 +246,9 @@ def event_details(request, id):
     if not event:
         return HttpResponseNotFound()
 
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
+
     context = {"event": event}
 
     template = loader.get_template("events/event_details.html")
@@ -125,6 +262,9 @@ def enroll_event(request, id):
 
     if not event:
         return HttpResponseNotFound()
+
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if event.status != EventModel.Status.OPEN:
         messages.error(request, _("Este evento não está aceitando inscrições."))
@@ -169,8 +309,10 @@ def edit_event(request: HttpRequest, id: int):
         return HttpResponseNotFound()
 
     if request.user != event.user:
-        messages.error(request, "Você não tem permissão para editar este evento.")
-        return redirect("event_details", id=id)
+        raise PermissionDenied("Você não tem permissão para editar este evento.")
+
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if request.method == "POST":
         form = EventForm(request.POST, instance=event)
@@ -236,13 +378,12 @@ def close_event(request, id):
         return HttpResponseNotFound()
 
     if not event.user == request.user:
-        return HttpResponseForbidden()
-
-    if event.start_date <= timezone.now():
-        messages.error(
-            request, "Não é possível fechar inscrições de um evento que já começou."
+        raise PermissionDenied(
+            "Você não tem permissão para fechar as inscrições deste evento."
         )
-        return redirect("event_details", id=id)
+
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if event.status == EventModel.Status.CLOSED:
         messages.warning(request, "As inscrições deste evento já estão fechadas.")
@@ -256,8 +397,10 @@ def close_event(request, id):
         return redirect("event_details", id=id)
 
     try:
-        event.status = EventModel.Status.CLOSED
-        event.save()
+        # Usar update para evitar validação do formulário
+        EventModel.objects.filter(id=id).update(
+            status=EventModel.Status.CLOSED, updated_at=timezone.now()
+        )
 
         messages.success(
             request,
@@ -279,8 +422,10 @@ def cancel_event(request, id):
         return HttpResponseNotFound()
 
     if request.user != event.user:
-        messages.error(request, "Você não tem permissão para cancelar este evento.")
-        return redirect("event_details", id=id)
+        raise PermissionDenied("Você não tem permissão para cancelar este evento.")
+
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if request.method == "POST":
         try:
@@ -288,8 +433,10 @@ def cancel_event(request, id):
                 messages.info(request, "Este evento já está cancelado.")
                 return redirect("event_details", id=id)
 
-            event.status = EventModel.Status.CANCELED
-            event.save()
+            # Usar update para evitar validação do formulário
+            EventModel.objects.filter(id=id).update(
+                status=EventModel.Status.CANCELED, updated_at=timezone.now()
+            )
 
             messages.success(request, "Evento cancelado com sucesso!")
             return redirect("event_details", id=id)
@@ -307,6 +454,7 @@ def cancel_event(request, id):
 # PRESENÇA E FINALIZAÇÃO
 # =====================================================================
 
+
 @login_required(login_url="landing_page")
 @teacher_only
 def event_attendance(request: HttpRequest, id):
@@ -316,11 +464,12 @@ def event_attendance(request: HttpRequest, id):
         return HttpResponseNotFound("Não foi possível localizar o evento")
 
     if request.user != event.user:
-        return redirect("event_details", id=id)
+        raise PermissionDenied(
+            "Você não tem permissão para acessar a lista de chamada deste evento."
+        )
 
-    if event.end_date <= timezone.now() and event.status != EventModel.Status.FINISHED:
-        auto_finish_event(event)
-        event.refresh_from_db()
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if request.method == "POST":
         participant_id = request.POST.get("participant_id")
@@ -335,11 +484,12 @@ def event_attendance(request: HttpRequest, id):
                     request, f"Status de {record.user.get_full_name()} atualizado."
                 )
 
+                # Verificar se pode finalizar após marcar presença
                 if (
                     event.end_date <= timezone.now()
                     and event.status != EventModel.Status.FINISHED
                 ):
-                    auto_finish_event(event)
+                    auto_finish_event(event.id)
                     event.refresh_from_db()
 
             except Exception:
@@ -369,15 +519,10 @@ def finish_event(request: HttpRequest, id: int):
     event = get_object_or_404(EventModel, id=id)
 
     if request.user != event.user:
-        messages.error(request, "Você não tem permissão para finalizar este evento.")
-        return redirect("event_details", id=id)
+        raise PermissionDenied("Você não tem permissão para finalizar este evento.")
 
-    if event.end_date > timezone.now():
-        messages.error(
-            request,
-            "O evento ainda não terminou. Aguarde a data de término para finalizar.",
-        )
-        return redirect("event_attendance", id=id)
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     if event.status == EventModel.Status.FINISHED:
         messages.info(request, "Este evento já está finalizado.")
@@ -385,6 +530,7 @@ def finish_event(request: HttpRequest, id: int):
 
     if request.method == "POST":
         try:
+            # Usar update para evitar validação do formulário
             EventModel.objects.filter(id=event.id).update(
                 status=EventModel.Status.FINISHED, updated_at=timezone.now()
             )
@@ -407,6 +553,7 @@ def finish_event(request: HttpRequest, id: int):
 # NOVA FUNÇÃO — CERTIFICADO VIA PLATYPUS/REPORTLAB (PDF-native)
 # =====================================================================
 
+
 @login_required(login_url="landing_page")
 @student_only
 def generate_certificate(request, id):
@@ -416,6 +563,9 @@ def generate_certificate(request, id):
     — roda em Windows/Linux sem dependências externas além do ReportLab.
     """
     event = get_object_or_404(EventModel, id=id)
+
+    # Atualizar status do evento automaticamente
+    event = update_event_status(event)
 
     participation = EventParticipantModel.objects.filter(
         event=event, user=request.user
@@ -433,7 +583,7 @@ def generate_certificate(request, id):
 
     # tentar finalizar automaticamente se aplicável
     if event.status != EventModel.Status.FINISHED:
-        was_finished = auto_finish_event(event)
+        was_finished = auto_finish_event(event.id)
         if not was_finished:
             messages.error(
                 request,
@@ -539,18 +689,22 @@ def generate_certificate(request, id):
             total_hours = time_difference.total_seconds() / 3600
             # Arredondar para 1 casa decimal
             duration_hours = round(total_hours, 1)
-            
+
             # Formatar datas para exibição
             start_date_str = event.start_date.strftime("%d/%m/%Y %H:%M")
             end_date_str = event.end_date.strftime("%d/%m/%Y %H:%M")
-            
+
             # Verificar se é no mesmo dia
             if event.start_date.date() == event.end_date.date():
                 date_range_str = f"<b>{event.start_date.strftime('%d/%m/%Y')}</b><br/>"
                 time_range_str = f"Das <b>{event.start_date.strftime('%H:%M')}</b> às <b>{event.end_date.strftime('%H:%M')}</b>"
             else:
-                date_range_str = f"De <b>{event.start_date.strftime('%d/%m/%Y %H:%M')}</b><br/>"
-                time_range_str = f"Até <b>{event.end_date.strftime('%d/%m/%Y %H:%M')}</b>"
+                date_range_str = (
+                    f"De <b>{event.start_date.strftime('%d/%m/%Y %H:%M')}</b><br/>"
+                )
+                time_range_str = (
+                    f"Até <b>{event.end_date.strftime('%d/%m/%Y %H:%M')}</b>"
+                )
         else:
             duration_hours = 0
             date_range_str = "Data não especificada"
@@ -568,16 +722,23 @@ def generate_certificate(request, id):
 
         # Data de emissão
         emission_date = timezone.now().strftime("%d/%m/%Y")
-        emission_text = f"Emitido digitalmente em {emission_date} através da plataforma Sinapse"
-        story.append(Paragraph(emission_text, ParagraphStyle(
-            "emission",
-            parent=base_styles["BodyText"],
-            fontName="Helvetica-Oblique",
-            fontSize=12,
-            alignment=TA_CENTER,
-            textColor=colors.HexColor("#6B7280"),
-            leading=16,
-        )))
+        emission_text = (
+            f"Emitido digitalmente em {emission_date} através da plataforma Sinapse"
+        )
+        story.append(
+            Paragraph(
+                emission_text,
+                ParagraphStyle(
+                    "emission",
+                    parent=base_styles["BodyText"],
+                    fontName="Helvetica-Oblique",
+                    fontSize=12,
+                    alignment=TA_CENTER,
+                    textColor=colors.HexColor("#6B7280"),
+                    leading=16,
+                ),
+            )
+        )
         story.append(Spacer(1, 0.6 * cm))
 
         # ID do certificado
@@ -586,14 +747,17 @@ def generate_certificate(request, id):
             f"{(request.user.first_name[:1] or '').upper()}{(request.user.last_name[:1] or '').upper()}-"
             f"{(event.name[:3] or '').upper()}"
         )
-        cert_para = Paragraph(cert_id, ParagraphStyle(
-            "cert_id",
-            parent=base_styles["BodyText"],
-            fontName="Helvetica",
-            fontSize=9,
-            alignment=TA_CENTER,
-            textColor=colors.HexColor("#9CA3AF"),
-        ))
+        cert_para = Paragraph(
+            cert_id,
+            ParagraphStyle(
+                "cert_id",
+                parent=base_styles["BodyText"],
+                fontName="Helvetica",
+                fontSize=9,
+                alignment=TA_CENTER,
+                textColor=colors.HexColor("#9CA3AF"),
+            ),
+        )
         story.append(cert_para)
 
         def draw_background(canvas_obj, doc_obj):
@@ -615,7 +779,7 @@ def generate_certificate(request, id):
             canvas_obj.rect(36, 36, w - 72, h - 72, stroke=1, fill=0)
 
             # Central watermark "SINAPSE"
-            watermark_color = colors.Color(79/255, 70/255, 229/255, alpha=0.06)
+            watermark_color = colors.Color(79 / 255, 70 / 255, 229 / 255, alpha=0.06)
             canvas_obj.setFillColor(watermark_color)
             canvas_obj.setFont("Helvetica-Bold", 120)
 
@@ -644,7 +808,6 @@ def generate_certificate(request, id):
         return response
 
     except Exception as e:
-        # Logging em stdout para facilitar debug (substitua por logger se desejar)
         print(f"Erro ao gerar certificado: {e}")
         messages.error(request, "Ocorreu um erro ao gerar o certificado.")
         return redirect("event_details", id=id)
@@ -653,6 +816,7 @@ def generate_certificate(request, id):
 # =====================================================================
 # LISTAGEM DE CERTIFICADOS
 # =====================================================================
+
 
 @login_required(login_url="landing_page")
 @student_only
@@ -663,11 +827,7 @@ def certificates(request):
 
     for participation in user_participations:
         event = participation.event
-        if event.end_date <= timezone.now() and event.status not in [
-            EventModel.Status.FINISHED,
-            EventModel.Status.CANCELED,
-        ]:
-            auto_finish_event(event)
+        update_event_status(event)
 
     available_certificates = EventParticipantModel.objects.filter(
         user=request.user,
@@ -675,54 +835,7 @@ def certificates(request):
         event__status=EventModel.Status.FINISHED,
     ).select_related("event")
 
-    print(available_certificates)
-
     context = {"available_certificates": available_certificates}
 
     template = loader.get_template("events/my_certificates.html")
     return HttpResponse(template.render(context=context, request=request))
-
-
-# =====================================================================
-# AUXILIARES
-# =====================================================================
-
-def auto_finish_event(event: EventModel) -> bool:
-    """
-    Finaliza automaticamente um evento se:
-    1. A data de término já passou
-    2. O evento não está cancelado
-    3. A lista de chamada foi feita (pelo menos um participante com status definido)
-    Retorna True se o evento foi finalizado, False caso contrário
-    """
-    if event.status in [EventModel.Status.FINISHED, EventModel.Status.CANCELED]:
-        return False
-
-    if event.end_date > timezone.now():
-        return False
-
-    # Verificar se há pelo menos um participante com status definido (lista de chamada feita)
-    has_attendance_records = event.participants_records.filter(
-        status__in=["PRESENT", "ABSENT"]
-    ).exists()
-
-    if not has_attendance_records:
-        return False
-
-    try:
-        event.status = EventModel.Status.FINISHED
-        event.save()
-        return True
-    except Exception:
-        return False
-
-
-def can_generate_certificates(event: EventModel) -> bool:
-    """
-    Verifica se o evento está em condições de gerar certificados
-    """
-    return (
-        event.status == EventModel.Status.FINISHED
-        and event.end_date <= timezone.now()
-        and event.participants_records.filter(status="PRESENT").exists()
-    )

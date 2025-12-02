@@ -1,6 +1,7 @@
 from functools import wraps
 from typing import Iterable
 
+from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponseForbidden
 from django.shortcuts import redirect
 from django.views import View
@@ -18,7 +19,7 @@ def student_only(view: View):
             not hasattr(request.user, "role")
             or request.user.role != UserModel.Role.STUDENT
         ):
-            return HttpResponseForbidden("Acesso negado.")
+            raise PermissionDenied()
 
         return view(request, *args, **kwargs)
 
@@ -35,7 +36,7 @@ def teacher_only(view: View):
             not hasattr(request.user, "role")
             or request.user.role != UserModel.Role.TEACHER
         ):
-            return HttpResponseForbidden("Acesso negado.")
+            raise PermissionDenied()
 
         return view(request, *args, **kwargs)
 
@@ -49,7 +50,7 @@ def superuser_only(view: View):
             return redirect("landing_page")
 
         if not request.user.is_staff:
-            return HttpResponseForbidden("Acesso negado.")
+            raise PermissionDenied()
 
         return view(request, *args, **kwargs)
 
