@@ -1,0 +1,45 @@
+<!-- templates/events/finish_event.html -->
+{% extends 'partials/base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-8">
+    <div class="bg-white rounded-xl shadow p-6">
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900 mb-2">Finalizar Evento</h3>
+            <p class="text-gray-600 mb-6">
+                Tem certeza que deseja finalizar o evento <strong>"{{ event.name }}"</strong>?
+            </p>
+            
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                <p class="text-sm text-yellow-800">
+                    ⚠️ <strong>Atenção:</strong> Esta ação não pode ser desfeita. Após finalizar:
+                </p>
+                <ul class="text-sm text-yellow-700 mt-2 text-left list-disc list-inside">
+                    <li>Não será possível editar o evento</li>
+                    <li>Não será possível alterar a lista de chamada</li>
+                    <li>O status do evento será alterado para "Finalizado"</li>
+                </ul>
+            </div>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a href="{% url 'event_attendance' event.id %}" 
+                       class="bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-300 text-center font-medium">
+                        Voltar
+                    </a>
+                    <button type="submit" 
+                            class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 shadow-lg font-medium">
+                        ✅ Confirmar finalização
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

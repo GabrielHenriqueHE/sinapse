@@ -1,249 +1,447 @@
+{% extends 'partials/base.html' %}
 {% load static %}
-<!DOCTYPE html>
 
-<html lang="pt-br">
-    {% include 'partials/_head.html' %}
-    <title>Tech Conference 2024 - Sinapse</title>
-        
-    <body class="bg-gray-50 min-h-screen">
-        <!-- Header -->
-        {% include 'partials/_header.html' %}
+{% block title %}{{ event.name }} - Sinapse{% endblock %}
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Cabeçalho do Evento -->
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-            <!-- Imagem do Evento -->
-            <div class="h-80 bg-gradient-to-br from-purple-500 to-pink-500 relative">
-                <div class="absolute inset-0 bg-black/20"></div>
-                <div class="absolute bottom-6 left-8 right-8">
-                    <div class="flex flex-col md:flex-row md:items-end md:justify-between">
-                        <div>
-                            <!-- Status Badge -->
-                            <span class="font-mono bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4 inline-block">
-                                🔓 EVENTO ABERTO
-                            </span>
-                            <h1 class="font-mono text-4xl md:text-5xl font-bold text-white mb-2">Tech Conference 2024</h1>
-                            <p class="font-mono text-white/90 text-lg">A maior conferência de tecnologia do ano</p>
-                        </div>
-                        <div class="mt-4 md:mt-0">
-                            <button class="font-mono bg-white text-gray-900 px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-300 shadow-lg">
-                                Participar do Evento
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Coluna Principal -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Sobre o Evento -->
-                <div class="bg-white rounded-2xl shadow-lg p-8">
-                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Sobre o Evento</h2>
-                    <div class="prose max-w-none">
-                        <p class="font-mono text-gray-700 leading-relaxed mb-4">
-                            A Tech Conference 2024 é o maior evento de tecnologia do ano, reunindo os melhores especialistas, 
-                            empreendedores e entusiastas da indústria. Durante três dias intensos, exploraremos as tendências 
-                            mais recentes em IA, blockchain, cloud computing e transformação digital.
-                        </p>
-                        <p class="font-mono text-gray-700 leading-relaxed mb-4">
-                            Com palestras inspiradoras, workshops práticos e oportunidades únicas de networking, este evento 
-                            é imperdível para profissionais que desejam se manter na vanguarda da inovação tecnológica.
-                        </p>
-                        <h3 class="font-mono text-xl font-bold text-gray-900 mt-6 mb-4">O que você vai aprender:</h3>
-                        <ul class="font-mono text-gray-700 space-y-2">
-                            <li>• Estratégias de implementação de IA generativa</li>
-                            <li>• Segurança cibernética em ambientes cloud</li>
-                            <li>• Metodologias ágeis para times de alta performance</li>
-                            <li>• Desenvolvimento sustentável de software</li>
-                            <li>• Tendências do mercado de tecnologia para 2025</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Informações do Organizador -->
-                <div class="bg-white rounded-2xl shadow-lg p-8">
-                    <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Organizador</h2>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full"></div>
-                        <div>
-                            <h3 class="font-mono text-xl font-bold text-gray-900">Tech Community BR</h3>
-                            <p class="font-mono text-gray-600">Comunidade de tecnologia com mais de 50 eventos realizados</p>
-                            <div class="flex space-x-4 mt-2">
-                                <span class="font-mono text-sm text-gray-500">⭐ 4.8 (124 avaliações)</span>
-                                <span class="font-mono text-sm text-gray-500">📅 52 eventos</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-8">
-                <!-- Informações Principais -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-6">Informações do Evento</h3>
-                    
-                    <div class="space-y-4">
-                        <!-- Data -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="font-mono text-gray-600">📅</span>
-                            </div>
-                            <div>
-                                <p class="font-mono text-sm text-gray-600">Data do Evento</p>
-                                <p class="font-mono font-bold text-gray-900">25 de Outubro de 2024</p>
-                                <p class="font-mono text-sm text-gray-500">09:00 - 18:00</p>
-                            </div>
-                        </div>
-
-                        <!-- Localização -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="font-mono text-gray-600">📍</span>
-                            </div>
-                            <div>
-                                <p class="font-mono text-sm text-gray-600">Localização</p>
-                                <p class="font-mono font-bold text-gray-900">Centro de Convenções</p>
-                                <p class="font-mono text-sm text-gray-500">
-                                    Avenida Paulista, 1234<br>
-                                    Bela Vista, São Paulo - SP<br>
-                                    CEP: 01310-100
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Carga Horária -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="font-mono text-gray-600">⏱️</span>
-                            </div>
-                            <div>
-                                <p class="font-mono text-sm text-gray-600">Carga Horária</p>
-                                <p class="font-mono font-bold text-gray-900">8 horas</p>
-                            </div>
-                        </div>
-
-                        <!-- Categoria -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="font-mono text-gray-600">🏷️</span>
-                            </div>
-                            <div>
-                                <p class="font-mono text-sm text-gray-600">Categoria</p>
-                                <p class="font-mono font-bold text-gray-900">Tecnologia</p>
-                            </div>
-                        </div>
-
-                        <!-- Limite de Participantes -->
-                        <div class="flex items-start space-x-3">
-                            <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <span class="font-mono text-gray-600">👥</span>
-                            </div>
-                            <div>
-                                <p class="font-mono text-sm text-gray-600">Participantes</p>
-                                <p class="font-mono font-bold text-gray-900">150 / 200 inscritos</p>
-                                <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
-                                    <div class="bg-green-600 h-2 rounded-full" style="width: 75%"></div>
-                                </div>
-                                <p class="font-mono text-xs text-gray-500 mt-1">75% das vagas preenchidas</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Status do Evento -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Status do Evento</h3>
-                    
-                    <div class="space-y-3">
-                        <!-- Status Atual -->
-                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-200">
-                            <span class="font-mono font-bold text-green-800">Evento Aberto</span>
-                            <span class="font-mono text-green-600">🔓</span>
-                        </div>
-
-                        <!-- Próximos Status -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center p-2 rounded-lg">
-                                <span class="font-mono text-sm text-gray-600">Fechado</span>
-                                <span class="font-mono text-gray-400">🔒</span>
-                            </div>
-                            <div class="flex justify-between items-center p-2 rounded-lg">
-                                <span class="font-mono text-sm text-gray-600">Finalizado</span>
-                                <span class="font-mono text-gray-400">✅</span>
-                            </div>
-                            <div class="flex justify-between items-center p-2 rounded-lg">
-                                <span class="font-mono text-sm text-gray-600">Cancelado</span>
-                                <span class="font-mono text-gray-400">❌</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Ações Rápidas -->
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                    <h3 class="font-mono text-xl font-bold text-gray-900 mb-4">Ações</h3>
-                    
-                    <div class="space-y-3">
-                        <button class="font-mono w-full bg-black text-white py-3 rounded-lg hover:bg-gray-800 transition duration-300">
-                            Participar do Evento
-                        </button>
-                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300">
-                            Compartilhar Evento
-                        </button>
-                        <button class="font-mono w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300">
-                            Salvar nos Favoritos
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Localização no Mapa -->
-        <div class="mt-8 bg-white rounded-2xl shadow-lg p-8">
-            <h2 class="font-mono text-2xl font-bold text-gray-900 mb-6">Localização</h2>
-            <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
-                <div class="text-center">
-                    <span class="font-mono text-4xl mb-2 block">🗺️</span>
-                    <p class="font-mono text-gray-600">Mapa interativo será exibido aqui</p>
-                    <p class="font-mono text-sm text-gray-500 mt-2">Centro de Convenções - Avenida Paulista, 1234</p>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center">
-                <p class="font-mono text-sm">&copy; 2024 Sinapse. Todos os direitos reservados.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        // Simulação de interação com o status do evento
-        document.addEventListener('DOMContentLoaded', function() {
-            const statusElements = document.querySelectorAll('.bg-white.rounded-2xl.shadow-lg.p-6 .space-y-2 > div');
+{% block content %}
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Cabeçalho do Evento -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+        <!-- Imagem do Evento -->
+        <div class="h-80 relative overflow-hidden">
+            {% if event.image_url %}
+                <img 
+                    src="{{ event.image_url }}" 
+                    alt="{{ event.name }}"
+                    class="w-full h-full object-cover brightness-75"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                >
+                <div class="absolute inset-0 bg-black/15"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500 {% if event.image_url %}hidden{% endif %}"></div>
+            {% else %}
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-500 to-pink-500"></div>
+            {% endif %}
             
-            statusElements.forEach(element => {
-                element.addEventListener('click', function() {
-                    // Remover destaque de todos
-                    statusElements.forEach(el => {
-                        el.classList.remove('bg-green-50', 'border', 'border-green-200');
-                        el.querySelector('span:first-child').classList.remove('font-bold', 'text-green-800');
-                        el.querySelector('span:last-child').classList.remove('text-green-600');
-                    });
+            <div class="absolute inset-0 bg-black/20"></div>
+            <div class="absolute bottom-6 left-8 right-8">
+                <div class="flex flex-col md:flex-row md:items-end md:justify-between">
+                    <div>
+                        <!-- Status Badge -->
+                        <span class="bg-{% if event.status == 'OPEN' %}green{% elif event.status == 'FINISHED' %}blue{% else %}red{% endif %}-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4 inline-block">
+                            {% if event.status == 'OPEN' %}🔓 EVENTO ABERTO{% elif event.status == 'FINISHED' %}✅ EVENTO FINALIZADO{% else %}🔒 EVENTO FECHADO{% endif %}
+                        </span>
+                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">{{ event.name }}</h1>
+                        <p class="text-white/90 text-lg">{{ event.description|default:"Evento incrível aguardando por você!"|truncatewords:20 }}</p>
+                    </div>
+                    <div class="mt-4 md:mt-0">
+                        {% if user.is_authenticated %}
+                            {% if user.role == 'TEACHER' and event.user == user %}
+                                <!-- Botões para Professor (criador do evento) -->
+                                <div class="mt-6">
+                                    {% if event.status != 'FINISHED' and event.status != 'CANCELED' %}
+                                    <a href="{% url 'edit_event' event.id %}" 
+                                       class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-6 py-3 rounded-lg hover:from-yellow-600 hover:to-orange-700 transition duration-300 shadow-lg font-medium inline-block">
+                                        Editar evento
+                                    </a>
+                                    {% else %}
+                                    <button class="bg-gray-400 text-white px-6 py-3 rounded-lg cursor-not-allowed shadow-lg font-medium" disabled>
+                                        {% if event.status == 'FINISHED' %}✅ Evento finalizado{% else %}❌ Evento cancelado{% endif %}
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            {% elif user.role == 'STUDENT' %}
+                                <!-- Botão para Aluno -->
+                                {% if event.status == 'OPEN' and not event.is_full %}
+                                    {% if user in event.participants.all %}
+                                        <button class="bg-gradient-to-br from-green-500 to-teal-600 text-white px-8 py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 shadow-lg font-medium" disabled>
+                                            ✅ Inscrito
+                                        </button>
+                                    {% else %}
+                                        <a href="{% url 'enroll_event' event.id %}">
+                                            <button class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
+                                                Participar do evento
+                                            </button>
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    <button class="bg-gray-400 text-white px-8 py-3 rounded-lg cursor-not-allowed shadow-lg font-medium" disabled>
+                                        {% if event.is_full %}Evento lotado{% else %}Inscrições encerradas{% endif %}
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            <!-- Botão para Não Autenticado -->
+                            <a href="{% url 'login' %}?next={{ request.path }}" class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
+                                Fazer login para participar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Coluna Principal -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Sobre o Evento -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Sobre o evento</h2>
+                <div class="prose max-w-none">
+                    <p class="text-gray-700 leading-relaxed mb-4">
+                        {{ event.description|default:"Este é um evento incrível que reúne pessoas com interesses em comum. O organizador ainda não adicionou uma descrição detalhada, mas promete ser uma experiência única e enriquecedora para todos os participantes." }}
+                    </p>
                     
-                    // Adicionar destaque ao clicado
-                    this.classList.add('bg-green-50', 'border', 'border-green-200');
-                    this.querySelector('span:first-child').classList.add('font-bold', 'text-green-800');
-                    this.querySelector('span:last-child').classList.add('text-green-600');
-                });
+                    {% if event.topics %}
+                    <h3 class="text-xl font-bold text-gray-900 mt-6 mb-4">Tópicos abordados:</h3>
+                    <div class="flex flex-wrap gap-2">
+                        {% for topic in event.topics %}
+                            <span class="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">{{ topic }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informações do Organizador -->
+            <div class="bg-white rounded-2xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Organizador</h2>
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {{ event.user.first_name|first }}{{ event.user.last_name|first }}
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">{{ event.user.first_name }} {{ event.user.last_name }}</h3>
+                        <p class="text-gray-600">Organizador na plataforma Sinapse</p>
+                        <div class="flex space-x-4 mt-2">
+                            <span class="text-sm text-gray-500">📅 {{ event.user.created_events.count }} eventos</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Apenas para o criador do evento -->
+                {% if user.is_authenticated and user.role == 'TEACHER' and event.user == user %}
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h4 class="font-bold text-blue-900 mb-2">Painel do organizador</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">{{ event.participants.count }}</div>
+                            <div class="text-sm text-blue-800">Inscritos</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">
+                                {% if event.participants_limit %}
+                                    {{ event.available_spots }}
+                                {% else %}
+                                    ∞
+                                {% endif %}
+                            </div>
+                            <div class="text-sm text-green-800">Vagas restantes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-purple-600">75%</div>
+                            <div class="text-sm text-purple-800">Taxa de ocupação</div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-8">
+            <!-- Informações Principais -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-6">Informações do evento</h3>
+                
+                <div class="space-y-4">
+                    <!-- Data -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span class="text-gray-600">📅</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Data do evento</p>
+                            {% if event.start_date.date == event.end_date.date %}
+                                <!-- Mesmo dia -->
+                                <p class="font-bold text-gray-900">{{ event.start_date|date:"d F Y" }}</p>
+                                <p class="text-sm text-gray-500">{{ event.start_date|date:"H:i" }} - {{ event.end_date|date:"H:i" }}</p>
+                            {% else %}
+                                <!-- Diferentes dias -->
+                                <p class="font-bold text-gray-900">
+                                    {{ event.start_date|date:"d F Y" }} - {{ event.end_date|date:"d F Y" }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    {{ event.start_date|date:"H:i" }} até {{ event.end_date|date:"d/m H:i" }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Localização -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span class="text-gray-600">📍</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Localização</p>
+                            <p class="font-bold text-gray-900">{{ event.street }}</p>
+                            <p class="text-sm text-gray-500">
+                                {{ event.city }}, {{ event.state }}<br>
+                                {% if event.complement %}{{ event.complement }}<br>{% endif %}
+                                CEP: {{ event.zip_code }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Categoria -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span class="text-gray-600">🏷️</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Categoria</p>
+                            <p class="font-bold text-gray-900">{{ event.category.name|capfirst }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Limite de Participantes -->
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <span class="text-gray-600">👥</span>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">Participantes</p>
+                            <p class="font-bold text-gray-900">
+                                {{ event.participants.count }} 
+                                {% if event.participants_limit %}
+                                    / {{ event.participants_limit }} inscritos
+                                {% else %}
+                                    inscritos
+                                {% endif %}
+                            </p>
+                            {% if event.participants_limit %}
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-green-600 h-2 rounded-full" style="width: {% widthratio event.participants.count event.participants_limit 100 %}%"></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">{% widthratio event.participants.count event.participants_limit 100 %}% das vagas preenchidas</p>
+                            {% else %}
+                            <p class="text-xs text-green-600 mt-1">Evento sem limite de participantes</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status do Evento -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Status do evento</h3>
+                
+                <div class="space-y-3">
+                    <!-- Status Atual -->
+                    <div class="flex justify-between items-center p-3 {% if event.status == 'OPEN' %}bg-green-50 border border-green-200{% elif event.status == 'CLOSED' %}bg-yellow-50 border border-yellow-200{% elif event.status == 'FINISHED' %}bg-blue-50 border border-blue-200{% else %}bg-gray-50 border border-gray-200{% endif %} rounded-lg">
+                        <span class="font-bold {% if event.status == 'OPEN' %}text-green-800{% elif event.status == 'CLOSED' %}text-yellow-800{% elif event.status == 'FINISHED' %}text-blue-800{% else %}text-gray-800{% endif %}">
+                            {{ event.get_status_display }}
+                        </span>
+                        <span class="{% if event.status == 'OPEN' %}text-green-600{% elif event.status == 'CLOSED' %}text-yellow-600{% elif event.status == 'FINISHED' %}text-blue-600{% else %}text-gray-600{% endif %}">
+                            {% if event.status == 'OPEN' %}🔓{% elif event.status == 'CLOSED' %}🔒{% elif event.status == 'FINISHED' %}✅{% else %}❌{% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Informações Adicionais -->
+                    {% if user.is_authenticated and user.role == 'TEACHER' and event.user == user %}
+                    <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <p class="text-sm text-blue-800">
+                            {% if event.status == 'OPEN' %}
+                                Seu evento está aceitando inscrições. 
+                                {% if event.participants_limit and event.is_full %}
+                                    <strong>Evento lotado!</strong>
+                                {% endif %}
+                            {% elif event.status == 'CLOSED' %}
+                                Inscrições encerradas para este evento.
+                            {% elif event.status == 'FINISHED' %}
+                                Evento finalizado. Não é possível fazer edições.
+                            {% else %}
+                                Este evento foi cancelado.
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Ações</h3>
+                
+                <div class="space-y-3">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'TEACHER' and event.user == user %}
+                            <!-- Ações para Professor (criador) -->
+                            {% if event.status != 'FINISHED' and event.status != 'CANCELED' %}
+                                <!-- Ações para eventos ativos -->
+                                <a href="{% url 'edit_event' event.id %}" class="w-full bg-gradient-to-br from-blue-500 to-purple-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-purple-700 transition duration-300 text-center block font-medium">
+                                    Editar evento
+                                </a>
+                                
+                                {% if event.attendance_available %}
+                                    <a href="{% url 'event_attendance' event.id %}" class="w-full bg-gradient-to-br from-green-500 to-teal-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 text-center block font-medium">
+                                        📋 Lista de Chamada
+                                    </a>
+                                {% else %}
+                                    <button class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                        ⏳ Lista de chamada (disponível após o evento)
+                                    </button>
+                                {% endif %}
+                            
+                                {% if event.status == 'OPEN' %}
+                                    <a href="{% url 'close_event' event.id %}" 
+                                    class="w-full border border-yellow-300 text-yellow-600 py-3 rounded-lg hover:bg-yellow-50 transition duration-300 text-center block font-medium">
+                                        🔒 Finalizar inscrições
+                                    </a>
+                                {% else %}
+                                    <button class="w-full bg-gray-300 text-gray-500 py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                        {% if event.status == 'CLOSED' %}
+                                            🔒 Inscrições encerradas
+                                        {% elif event.status == 'FINISHED' %}
+                                            ✅ Evento finalizado
+                                        {% else %}
+                                            ❌ Evento cancelado
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                                
+                                <a href="{% url 'cancel_event' event.id %}" class="w-full bg-red-600 text-white border hover:text-red-600 py-3 rounded-lg hover:bg-white hover:border-red-600 transition duration-300 text-center block font-medium">
+                                    Cancelar evento
+                                </a>
+                            {% else %}
+                                <!-- Ações para eventos finalizados ou cancelados -->
+                                <div class="w-full bg-gray-100 text-gray-600 py-3 rounded-lg text-center font-medium">
+                                    {% if event.status == 'FINISHED' %}
+                                        ✅ Evento finalizado
+                                    {% else %}
+                                        ❌ Evento cancelado
+                                    {% endif %}
+                                </div>
+                                
+                                {% if event.status == 'FINISHED' %}
+                                    <a href="{% url 'event_attendance' event.id %}" class="w-full border border-blue-300 text-blue-600 py-3 rounded-lg hover:bg-blue-50 transition duration-300 text-center block font-medium">
+                                        📋 Ver lista de chamada
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                            
+                        {% elif user.role == 'STUDENT' %}
+                            <!-- Ações para Aluno -->
+                            {% if event.status == 'FINISHED' %}
+                                <!-- Buscar o registro de participação do usuário atual -->
+                                {% with user_participation=event.participants_records.all|dictsort:"user_id" %}
+                                    {% for participation in user_participation %}
+                                        {% if participation.user_id == user.id %}
+                                            {% if participation.status == 'PRESENT' %}
+                                                <!-- Usuário com presença confirmada -->
+                                                <a href="{% url 'generate_certificate' event.id %}" 
+                                                   class="w-full bg-gradient-to-br from-green-500 to-teal-600 text-white py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 text-center block font-medium">
+                                                    📄 Baixar certificado
+                                                </a>
+                                            {% elif participation.status == 'ABSENT' %}
+                                                <!-- Usuário marcado como ausente -->
+                                                <div class="w-full bg-red-50 border border-red-200 text-red-800 py-3 rounded-lg text-center text-sm">
+                                                    ❌ Você não compareceu ao evento
+                                                </div>
+                                            {% else %}
+                                                <!-- Status pendente -->
+                                                <div class="w-full bg-yellow-50 border border-yellow-200 text-yellow-800 py-3 rounded-lg text-center text-sm">
+                                                    ⏳ Aguardando confirmação de presença
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% empty %}
+                                        <!-- Usuário não está inscrito no evento -->
+                                        <button class="w-full bg-gray-400 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                            ✅ Evento Finalizado
+                                        </button>
+                                    {% endfor %}
+                                {% endwith %}
+                                
+                            {% elif event.status == 'OPEN' and not event.is_full %}
+                                {% if user in event.participants.all %}
+                                    <button class="w-full bg-green-500 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                        ✅ Inscrição confirmada
+                                    </button>
+                                    <a href="{% url 'cancel_enrollment' event.id %}" class="w-full border border-red-300 text-red-600 py-3 rounded-lg hover:bg-red-50 transition duration-300 text-center block font-medium">
+                                        Cancelar inscrição
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'enroll_event' event.id %}" class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 text-center block font-medium">
+                                        Participar do evento
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <button class="w-full bg-gray-400 text-white py-3 rounded-lg cursor-not-allowed font-medium" disabled>
+                                    {% if event.status == 'FINISHED' %}Evento Finalizado{% elif event.status == 'CANCELED' %}Evento Cancelado{% elif event.is_full %}Evento Lotado{% else %}Inscrições encerradas{% endif %}
+                                </button>
+                            {% endif %}
+                            
+                            <!-- Link para página de certificados (sempre visível para alunos) -->
+                            <a href="{% url 'certificates' %}" 
+                               class="w-full border border-purple-300 text-purple-600 py-3 rounded-lg hover:bg-purple-50 transition duration-300 text-center block font-medium">
+                                📜 Ver todos os certificados
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <!-- Ações para Não Autenticado -->
+                        <a href="{% url 'login' %}?next={{ request.path }}" class="w-full bg-gradient-to-br from-purple-500 to-blue-600 text-white py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 text-center block font-medium">
+                            Fazer login
+                        </a>
+                        <a href="{% url 'register' %}?next={{ request.path }}" class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 text-center block font-medium">
+                            Criar conta
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Ação Universal -->
+                    <button class="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition duration-300 font-medium">
+                        Compartilhar evento
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Localização no Mapa -->
+    <div class="mt-8 bg-white rounded-2xl shadow-lg p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Localização</h2>
+        <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex items-center justify-center">
+            <div class="text-center">
+                <span class="text-4xl mb-2 block">🗺️</span>
+                <p class="text-gray-600">Mapa interativo será exibido aqui</p>
+                <p class="text-sm text-gray-500 mt-2">{{ event.street }}, {{ event.city }} - {{ event.state }}</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fallback para imagens que não carregam
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                const fallback = this.nextElementSibling;
+                if (fallback && fallback.classList.contains('absolute')) {
+                    fallback.style.display = 'block';
+                }
             });
         });
-    </script>
-</body>
-</html>
+
+        // Confirmação para ações destrutivas
+        document.querySelectorAll('a[href*="cancel"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!confirm('Tem certeza que deseja realizar esta ação?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

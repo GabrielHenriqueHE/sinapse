@@ -1,0 +1,247 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Cadastro - Sinapse{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="flex justify-center">
+            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg"></div>
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
+            Crie sua conta
+        </h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
+            Já tem uma conta?
+            <a href="{% url 'login' %}" class="font-medium text-purple-600 hover:text-purple-500 transition duration-300">
+                Faça login
+            </a>
+        </p>
+    </div>
+
+    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
+        <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="rounded-md {% if message.tags == 'error' %}bg-red-50 border border-red-200{% else %}bg-green-50 border border-green-200{% endif %} p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                {% if message.tags == 'error' %}
+                                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                    </svg>
+                                {% else %}
+                                    <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                {% endif %}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium {% if message.tags == 'error' %}text-red-800{% else %}text-green-800{% endif %}">
+                                    {{ message }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form class="space-y-6" method="post">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Nome
+                        </label>
+                        <div class="mt-1">
+                            {{ form.first_name }}
+                        </div>
+                        {% if form.first_name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.first_name.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                            Sobrenome
+                        </label>
+                        <div class="mt-1">
+                            {{ form.last_name }}
+                        </div>
+                        {% if form.last_name.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.last_name.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Email
+                    </label>
+                    <div class="mt-1">
+                        {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.email.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- NOVO CAMPO: Tipo de Conta -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        Tipo de Conta *
+                    </label>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 p-4 focus:outline-none">
+                            <input type="radio" name="role" value="STUDENT" class="sr-only" 
+                                   {% if form.role.value == 'STUDENT' or not form.role.value %}checked{% endif %}>
+                            <div class="flex w-full items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm">
+                                        <p class="font-medium text-gray-900">Estudante</p>
+                                        <p class="text-gray-500">Participar de eventos</p>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 text-purple-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="relative flex cursor-pointer rounded-lg border border-gray-300 p-4 focus:outline-none">
+                            <input type="radio" name="role" value="TEACHER" class="sr-only"
+                                   {% if form.role.value == 'TEACHER' %}checked{% endif %}>
+                            <div class="flex w-full items-center justify-between">
+                                <div class="flex items-center">
+                                    <div class="text-sm">
+                                        <p class="font-medium text-gray-900">Professor/Organizador</p>
+                                        <p class="text-gray-500">Criar e gerenciar eventos</p>
+                                    </div>
+                                </div>
+                                <div class="flex-shrink-0 text-purple-600">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                    {% if form.role.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.role.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 mt-2">
+                        Escolha o tipo de conta de acordo com sua necessidade
+                    </p>
+                </div>
+
+                <div>
+                    <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Senha
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password1 }}
+                    </div>
+                    {% if form.password1.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.password1.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Confirmar Senha
+                    </label>
+                    <div class="mt-1">
+                        {{ form.password2 }}
+                    </div>
+                    {% if form.password2.errors %}
+                        <div class="mt-1 text-sm text-red-600">
+                            {{ form.password2.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-start">
+                    {{ form.terms }}
+                    <div class="ml-3">
+                        <label for="{{ form.terms.id_for_label }}" class="block text-sm text-gray-700">
+                            Concordo com os
+                            <a href="#" class="font-medium text-purple-600 hover:text-purple-500 transition duration-300">Termos de Serviço</a>
+                            e
+                            <a href="#" class="font-medium text-purple-600 hover:text-purple-500 transition duration-300">Política de Privacidade</a>
+                        </label>
+                        {% if form.terms.errors %}
+                            <div class="mt-1 text-sm text-red-600">
+                                {{ form.terms.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white btn-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                        Criar conta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilo para os cards de seleção de role */
+    input[name="role"]:checked + div {
+        background-color: #faf5ff;
+    }
+    
+    input[name="role"]:checked + div .text-purple-600 {
+        display: block;
+    }
+    
+    input[name="role"] + div .text-purple-600 {
+        display: none;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Adicionar interatividade aos cards de seleção de role
+        const roleCards = document.querySelectorAll('input[name="role"]');
+        
+        roleCards.forEach(card => {
+            card.addEventListener('change', function() {
+                // Remover seleção de todos os cards
+                document.querySelectorAll('input[name="role"]').forEach(c => {
+                    c.parentElement.classList.remove('border-purple-500', 'bg-purple-50');
+                    c.parentElement.classList.add('border-gray-300');
+                });
+                
+                // Adicionar seleção ao card clicado
+                if (this.checked) {
+                    this.parentElement.classList.add('border-purple-500', 'bg-purple-50');
+                    this.parentElement.classList.remove('border-gray-300');
+                }
+            });
+            
+            // Inicializar estado dos cards
+            if (card.checked) {
+                card.parentElement.classList.add('border-purple-500', 'bg-purple-50');
+                card.parentElement.classList.remove('border-gray-300');
+            }
+        });
+    });
+</script>
+{% endblock %}

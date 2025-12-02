@@ -1,0 +1,106 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block title %}Meus Certificados - Sinapse{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Cabeçalho -->
+        <div class="text-center mb-12">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl flex items-center justify-center">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Meus Certificados</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Gerencie e baixe seus certificados de participação em eventos
+            </p>
+        </div>
+
+        <!-- Mensagens -->
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-red-50 border border-red-200 text-red-800{% endif %} rounded-lg p-4 mb-3">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Lista de Certificados -->
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+            {% if available_certificates %}
+                <div class="divide-y divide-gray-200">
+                    {% for participation in available_certificates %}
+                    <div class="p-6 hover:bg-gray-50 transition duration-300">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                    {{ participation.event.name }}
+                                </h3>
+                                <div class="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        {{ participation.event.city }}, {{ participation.event.state }}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        {{ participation.event.start_date|date:"d/m/Y" }}
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Presença confirmada
+                                    </div>
+                                </div>
+                                <p class="text-gray-700 text-sm">
+                                    Organizador: <span class="font-semibold">{{ participation.event.user.get_full_name }}</span>
+                                </p>
+                            </div>
+                            
+                            <div class="mt-4 md:mt-0">
+                                <a href="{% url 'generate_certificate' participation.event.id %}" 
+                                   class="bg-gradient-to-br from-green-500 to-teal-600 text-white px-6 py-3 rounded-lg hover:from-green-600 hover:to-teal-700 transition duration-300 shadow-lg font-medium inline-flex items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    Baixar certificado
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="text-gray-400 mb-4">
+                        <svg class="mx-auto h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum certificado disponível</h3>
+                    <p class="text-gray-500 mb-4">
+                        Você ainda não possui certificados disponíveis para download.<br>
+                        Os certificados ficam disponíveis após a finalização dos eventos em que você compareceu.
+                    </p>
+                    <a href="{% url 'events_index' %}" 
+                       class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-6 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
+                        Explorar Eventos
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

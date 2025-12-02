@@ -18,9 +18,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-5enaj_2x=c7y27g20%b-gek%m(3)m1$7w4+9l2ri)snrd3)7a1"
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -110,3 +110,6 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "config/static"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+handler403 = "config.urls.custom_403_view"
+handler404 = "config.urls.custom_404_view"

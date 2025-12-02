@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.core.exceptions import ValidationError
 
-from .models import UserModel
+from apps.authentication.models import UserModel
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -10,9 +11,8 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.TextInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm",
                 "placeholder": "Seu nome",
-                "id": "form-create-account-first-name-input",
             }
         ),
     )
@@ -22,9 +22,8 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.TextInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm",
                 "placeholder": "Seu sobrenome",
-                "id": "form-create-account-last-name-input",
             }
         ),
     )
@@ -33,20 +32,31 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.EmailInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm",
                 "placeholder": "seu@email.com",
-                "id": "form-create-account-email-input",
             }
         ),
+    )
+
+    # NOVO CAMPO: Tipo de conta
+    role = forms.ChoiceField(
+        choices=UserModel.Role.choices,
+        required=True,
+        widget=forms.RadioSelect(
+            attrs={
+                "class": "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300",
+            }
+        ),
+        initial=UserModel.Role.STUDENT,
+        label="Tipo de Conta",
     )
 
     password1 = forms.CharField(
         required=True,
         widget=forms.PasswordInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm",
                 "placeholder": "Crie uma senha",
-                "id": "form-create-account-password-input",
             }
         ),
     )
@@ -55,9 +65,8 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         widget=forms.PasswordInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm",
                 "placeholder": "Confirme sua senha",
-                "id": "form-create-account-confirm-password-input",
             }
         ),
     )
@@ -65,37 +74,29 @@ class CustomUserCreationForm(UserCreationForm):
     terms = forms.BooleanField(
         required=True,
         widget=forms.CheckboxInput(
-            attrs={"class": "rounded border-gray-300 text-black focus:ring-black mt-1"}
+            attrs={
+                "class": "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            }
         ),
         error_messages={"required": "Você deve aceitar os termos de serviço."},
     )
 
     class Meta:
         model = UserModel
-        fields = ("first_name", "last_name", "email", "password1", "password2")
+        fields = ("first_name", "last_name", "email", "role", "password1", "password2")
 
-    def clean_email(self):
-        email = self.cleaned_data.get("email")
-        if UserModel.objects.filter(email=email).exists():
-            raise forms.ValidationError("Este email já está em uso.")
-        return email
-
-    def clean(self):
-        cleaned_data = super().clean()
-        password1 = cleaned_data.get("password1")
-        password2 = cleaned_data.get("password2")
-
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError("As senhas não coincidem.")
-
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remover a ajuda padrão de senha do Django (opcional)
+        self.fields["password1"].help_text = None
+        self.fields["password2"].help_text = None
 
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(
         widget=forms.EmailInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm",
                 "placeholder": "seu@email.com",
                 "autocomplete": "email",
             }
@@ -105,7 +106,7 @@ class CustomAuthenticationForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                "class": "font-mono w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent outline-none transition duration-300",
+                "class": "appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm",
                 "placeholder": "Sua senha",
                 "autocomplete": "current-password",
             }
@@ -115,10 +116,11 @@ class CustomAuthenticationForm(AuthenticationForm):
     remember_me = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(
-            attrs={"class": "rounded border-gray-300 text-black focus:ring-black"}
+            attrs={
+                "class": "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+            }
         ),
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["username"].label = "Email"
+    class Meta:
+        model = UserModel

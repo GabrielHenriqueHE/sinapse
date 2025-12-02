@@ -1,7 +1,8 @@
+<!-- templates/events/edit_event.html -->
 {% extends 'partials/base.html' %}
 {% load static %}
 
-{% block title %}Criar Evento - Sinapse{% endblock %}
+{% block title %}Editar {{ event.name }} - Sinapse{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50 py-8">
@@ -9,15 +10,15 @@
         <!-- Cabeçalho da Página -->
         <div class="text-center mb-12">
             <div class="flex justify-center mb-4">
-                <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center">
                     <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                     </svg>
                 </div>
             </div>
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Criar novo evento</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Editar evento</h1>
             <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                Preencha os dados do seu evento e compartilhe experiências incríveis com a comunidade
+                Atualize as informações do seu evento e mantenha tudo organizado
             </p>
         </div>
 
@@ -77,7 +78,7 @@
                             {{ form.description }}
                             <div class="text-xs text-gray-500 mt-2 flex justify-between">
                                 <span>Descreva seu evento de forma clara e atraente</span>
-                                <div><span id="charCount">0</span>/300 caracteres</div>
+                                <div><span id="charCount">{{ form.description.value|length|default:0 }}</span>/300 caracteres</div>
                             </div>
                             {% if form.description.errors %}
                             <div class="text-sm text-red-600 mt-2">
@@ -225,6 +226,11 @@
                                 {{ form.start_date.label }} *
                             </label>
                             {{ form.start_date }}
+                            {% if event.start_date < now %}
+                            <p class="text-xs text-gray-500 mt-2">
+                                ⚠️ Não é possível alterar datas de eventos que já começaram
+                            </p>
+                            {% endif %}
                             {% if form.start_date.errors %}
                             <div class="text-sm text-red-600 mt-2">
                                 {% for error in form.start_date.errors %}
@@ -240,6 +246,11 @@
                                 {{ form.end_date.label }} *
                             </label>
                             {{ form.end_date }}
+                            {% if event.start_date < now %}
+                            <p class="text-xs text-gray-500 mt-2">
+                                ⚠️ Não é possível alterar datas de eventos que já começaram
+                            </p>
+                            {% endif %}
                             {% if form.end_date.errors %}
                             <div class="text-sm text-red-600 mt-2">
                                 {% for error in form.end_date.errors %}
@@ -291,6 +302,26 @@
                             </div>
                             {% endif %}
                         </div>
+
+                        <!-- Status do Evento -->
+                        <div class="md:col-span-2">
+                            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                                Status do Evento
+                            </label>
+                            <div class="flex flex-wrap gap-4">
+                                {% for choice in event.Status.choices %}
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="status" value="{{ choice.0 }}" 
+                                           {% if event.status == choice.0 %}checked{% endif %}
+                                           class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300">
+                                    <span class="ml-2 text-sm text-gray-700">{{ choice.1 }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2">
+                                Altere o status do evento conforme necessário
+                            </p>
+                        </div>
                     </div>
                 </div>
 
@@ -316,6 +347,22 @@
                             {% endfor %}
                         </div>
                         {% endif %}
+                        
+                        <!-- Preview da Imagem Atual -->
+                        {% if event.image_url %}
+                        <div class="mt-4">
+                            <p class="text-sm font-medium text-gray-700 mb-2">Imagem Atual:</p>
+                            <div class="w-48 h-32 border border-gray-300 rounded-lg overflow-hidden">
+                                <img src="{{ event.image_url }}" 
+                                     alt="Imagem atual do evento" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center hidden">
+                                    <span class="text-gray-500 text-sm">Imagem não disponível</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -323,26 +370,51 @@
                 <div class="bg-gray-50 px-8 py-6 border-t border-gray-200">
                     <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
                         <p class="text-sm text-gray-500 text-center sm:text-left">
-                            Ao criar um evento, você concorda com nossos 
+                            Ao editar um evento, você concorda com nossos 
                             <a href="#" class="text-purple-600 hover:text-purple-500 transition duration-300 font-medium">Termos de Serviço</a> 
                             e 
                             <a href="#" class="text-purple-600 hover:text-purple-500 transition duration-300 font-medium">Política de Eventos</a>
                         </p>
                         
                         <div class="flex flex-col sm:flex-row gap-4">
-                            <a href="{% url 'events_index' %}" 
+                            <a href="{% url 'event_details' event.id %}" 
                                class="bg-white text-gray-700 border border-gray-300 px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-300 text-center font-medium">
                                 Cancelar
                             </a>
                             <button type="submit" 
-                                    class="bg-gradient-to-br from-purple-500 to-blue-600 text-white px-8 py-3 rounded-lg hover:from-purple-600 hover:to-blue-700 transition duration-300 shadow-lg font-medium">
-                                Criar evento
+                                    class="bg-gradient-to-br from-yellow-500 to-orange-600 text-white px-8 py-3 rounded-lg hover:from-yellow-600 hover:to-orange-700 transition duration-300 shadow-lg font-medium">
+                                Salvar alterações
                             </button>
                         </div>
                     </div>
                 </div>
             </form>
         </div>
+
+        <!-- Seção de Perigo (Ações Destrutivas) -->
+        {% if event.status != 'CANCELED' %}
+        <div class="mt-8 bg-red-50 border border-red-200 rounded-2xl p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <h3 class="text-lg font-bold text-red-800">Zona de Perigo</h3>
+                    <p class="text-red-700 text-sm mt-1">
+                        Estas ações são irreversíveis. Por favor, proceda com cautela.
+                    </p>
+                    <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                        <a href="{% url 'cancel_event' event.id %}" 
+                           class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300 text-sm font-medium text-center">
+                            Cancelar evento
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
 
@@ -373,32 +445,16 @@
             });
         }
 
-        // Validação de datas
+        // Validação de datas (apenas para eventos que ainda não começaram)
         const startDateInput = document.getElementById('{{ form.start_date.id_for_label }}');
         const endDateInput = document.getElementById('{{ form.end_date.id_for_label }}');
         
         if (startDateInput && endDateInput) {
-            // Definir data mínima como hoje
-            const now = new Date();
-            const timezoneOffset = now.getTimezoneOffset() * 60000;
-            const localISOTime = new Date(now - timezoneOffset).toISOString().slice(0, 16);
-            startDateInput.min = localISOTime;
-            
             // Validar que a data final é após a data inicial
             startDateInput.addEventListener('change', function() {
                 endDateInput.min = this.value;
                 if (endDateInput.value && endDateInput.value < this.value) {
                     endDateInput.value = this.value;
-                }
-            });
-
-            // Validação em tempo real para datas passadas
-            startDateInput.addEventListener('change', function() {
-                const selectedDate = new Date(this.value);
-                if (selectedDate < new Date()) {
-                    this.setCustomValidity('A data de início não pode ser no passado');
-                } else {
-                    this.setCustomValidity('');
                 }
             });
         }
@@ -451,8 +507,9 @@
             form.addEventListener('submit', function(event) {
                 let isValid = true;
                 
-                // Validar datas
-                if (startDateInput && endDateInput) {
+                // Validar datas apenas para eventos que ainda não começaram
+                const eventStarted = new Date('{{ event.start_date.isoformat }}') < new Date();
+                if (!eventStarted && startDateInput && endDateInput) {
                     const startDate = new Date(startDateInput.value);
                     const endDate = new Date(endDateInput.value);
                     
@@ -476,6 +533,18 @@
                 return isValid;
             });
         }
+
+        // Fallback para imagens que não carregam
+        document.querySelectorAll('img').forEach(img => {
+            img.addEventListener('error', function() {
+                this.style.display = 'none';
+                const fallback = this.nextElementSibling;
+                if (fallback && fallback.classList.contains('hidden')) {
+                    fallback.classList.remove('hidden');
+                    fallback.classList.add('flex');
+                }
+            });
+        });
     });
 </script>
 {% endblock %}
